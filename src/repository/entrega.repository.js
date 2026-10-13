@@ -58,6 +58,15 @@ function reemplazar(id, d) {
   return buscarPorId(id);
 }
 
+function calificar(id, { nota, retroalimentacion, fechaCalificacion }) {
+  db.prepare(`
+    UPDATE entregas
+    SET nota = ?, retroalimentacion = ?, fecha_calificacion = ?, estado = 'calificada'
+    WHERE id = ?
+  `).run(nota, retroalimentacion, fechaCalificacion, id);
+  return buscarPorId(id);
+}
+
 function listarEstudiantesConEntrega(cursoId, actividadId) {
   return db.prepare(`
     SELECT u.id AS estudianteId, u.nombre, u.apellido, u.email,
@@ -87,6 +96,7 @@ module.exports = {
   buscarPorActividadYEstudiante,
   crear,
   reemplazar,
+  calificar,
   listarEstudiantesConEntrega,
   obtenerArchivo,
 };
