@@ -79,6 +79,89 @@ router.get('/', actividadController.listarPorCurso);
 /**
  * @swagger
  * /api/cursos/{cursoId}/actividades/{actividadId}/entregas:
+ *   get:
+ *     summary: Consultar entregas de estudiantes de una actividad (HU-014)
+ *     tags: [Actividad]
+ *     parameters:
+ *       - in: path
+ *         name: cursoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: actividadId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: docenteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Entregas y estudiantes sin entrega
+ *       400:
+ *         description: Error de validación
+ *       403:
+ *         description: El usuario no es el docente dueño del curso
+ *       404:
+ *         description: Curso, docente o actividad no encontrada
+ */
+router.get('/:actividadId/entregas', entregaController.listarEntregas);
+
+/**
+ * @swagger
+ * /api/cursos/{cursoId}/actividades/{actividadId}/entregas/{entregaId}/archivo:
+ *   get:
+ *     summary: Abrir el archivo entregado en una actividad (HU-014)
+ *     tags: [Actividad]
+ *     parameters:
+ *       - in: path
+ *         name: cursoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: actividadId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: entregaId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: docenteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: descargar
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: Archivo de la entrega
+ *         content:
+ *           application/octet-stream:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Error de validación
+ *       403:
+ *         description: El usuario no es el docente dueño del curso
+ *       404:
+ *         description: Curso, docente, actividad, entrega o archivo no encontrado
+ */
+router.get('/:actividadId/entregas/:entregaId/archivo', entregaController.verArchivo);
+
+/**
+ * @swagger
+ * /api/cursos/{cursoId}/actividades/{actividadId}/entregas:
  *   post:
  *     summary: Entregar una actividad (HU-013)
  *     tags: [Actividad]
