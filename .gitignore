@@ -1,0 +1,29 @@
+
+# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Base de datos local y archivos temporales SQLite
+*.sqlite
+*.sqlite3
+*.db
+*-shm
+*-wal
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# Copias locales de seguridad
+*.sqlite.backup
+*.db.backup
