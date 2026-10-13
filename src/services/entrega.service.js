@@ -6,6 +6,7 @@ const inscripcionRepository = require('../repository/inscripcion.repository');
 const { ErrorApp } = require('../utils/errores');
 
 const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_RETRO = 1000;
 const TIPOS_PERMITIDOS = [
   'image/png',
   'image/jpeg',
@@ -122,6 +123,47 @@ function obtenerArchivoEntrega(cursoId, actividadId, entregaId, docenteId) {
   };
 }
 
+function validarNota(nota, puntajeMaximo) {
+  if (typeof nota !== 'number' || !Number.isFinite(nota)) {
+    throw new ErrorApp('La nota es obligatoria y debe ser un número');
+  }
+  if (nota < 0 || nota > puntajeMaximo) {
+    throw new ErrorApp(`La nota debe estar entre 0 y ${puntajeMaximo}`);
+  }
+  if (
+    Math.round(nota * 100) !== nota * 100
+    && Math.abs(Math.round(nota * 100) - nota * 100) > 1e-9
+  ) {
+    throw new ErrorApp('La nota admite máximo 2 decimales');
+  }
+  return Math.round(nota * 100) / 100;
+}
+
+function calificarEntrega(cursoId, actividadId, entregaId, datos) {
+  const { docenteId, nota, retroalimentacion } = datos || {};
+  const actividad = validarDocenteDeActividad(cursoId, actividadId, docenteId);
+
+  const entrega = entregaRepository.buscarPorId(entregaId);
+  if (!entrega || entrega.actividadId !== Number(actividadId)) {
+    throw new ErrorApp('Entrega no encontrada', 404);
+  }
+
+  const notaValidada = validarNota(nota, actividad.puntajeMaximo);
+  let retroalimentacionValidada = null;
+  if (retroalimentacion !== undefined) {
+    if (typeof retroalimentacion !== 'string' || retroalimentacion.length > MAX_RETRO) {
+      throw new ErrorApp('La retroalimentación debe ser texto de máximo 1000 caracteres');
+    }
+    retroalimentacionValidada = retroalimentacion.trim() || null;
+  }
+
+  return aBooleanos(entregaRepository.calificar(entrega.id, {
+    nota: notaValidada,
+    retroalimentacion: retroalimentacionValidada,
+    fechaCalificacion: new Date().toISOString(),
+  }));
+}
+
 function entregar(cursoId, actividadId, datos) {
   const { estudianteId, archivo, archivoNombre, comentario } = datos;
   if (!estudianteId) throw new ErrorApp('estudianteId es obligatorio');
@@ -192,4 +234,9 @@ function entregar(cursoId, actividadId, datos) {
   };
 }
 
-module.exports = { entregar, listarEntregasDeActividad, obtenerArchivoEntrega };
+module.exports = {
+  entregar,
+  listarEntregasDeActividad,
+  obtenerArchivoEntrega,
+  calificarEntrega,
+};
