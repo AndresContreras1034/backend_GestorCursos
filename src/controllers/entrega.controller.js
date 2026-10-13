@@ -50,4 +50,19 @@ function verArchivo(req, res) {
   }
 }
 
-module.exports = { entregar, listarEntregas, verArchivo };
+function calificarEntrega(req, res) {
+  try {
+    const { cursoId, actividadId, entregaId } = req.params;
+    const { docenteId, nota, retroalimentacion } = req.body;
+    const entrega = entregaService.calificarEntrega(cursoId, actividadId, entregaId, {
+      docenteId,
+      nota,
+      retroalimentacion,
+    });
+    res.status(200).json(entrega);
+  } catch (error) {
+    res.status(error.status || 400).json({ error: error.message });
+  }
+}
+
+module.exports = { entregar, listarEntregas, verArchivo, calificarEntrega };

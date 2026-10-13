@@ -161,6 +161,52 @@ router.get('/:actividadId/entregas/:entregaId/archivo', entregaController.verArc
 
 /**
  * @swagger
+ * /api/cursos/{cursoId}/actividades/{actividadId}/entregas/{entregaId}/calificacion:
+ *   put:
+ *     summary: Calificar o recalificar una entrega (HU-015)
+ *     description: La escala por defecto es de 0 a 5; se permiten hasta 2 decimales y el máximo real depende de puntajeMaximo de la actividad.
+ *     tags: [Actividad]
+ *     parameters:
+ *       - in: path
+ *         name: cursoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: actividadId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: entregaId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [docenteId, nota]
+ *             properties:
+ *               docenteId: { type: integer }
+ *               nota: { type: number, minimum: 0, maximum: 5, example: 4.5, description: Escala por defecto 0-5; el máximo real depende de puntajeMaximo de la actividad }
+ *               retroalimentacion: { type: string, maxLength: 1000 }
+ *     responses:
+ *       200:
+ *         description: Entrega calificada
+ *       400:
+ *         description: Nota o retroalimentación inválida
+ *       403:
+ *         description: El docente no es dueño del curso
+ *       404:
+ *         description: Curso, actividad o entrega no encontrada
+ */
+router.put('/:actividadId/entregas/:entregaId/calificacion', entregaController.calificarEntrega);
+
+/**
+ * @swagger
  * /api/cursos/{cursoId}/actividades/{actividadId}/entregas:
  *   post:
  *     summary: Entregar una actividad (HU-013)
