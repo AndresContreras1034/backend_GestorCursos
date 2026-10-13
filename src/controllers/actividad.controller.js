@@ -25,4 +25,14 @@ function listarPorCurso(req, res) {
   }
 }
 
-module.exports = { crearActividad, listarPorCurso };
+function actualizarConfigEntrega(req, res) {
+  try {
+    const { cursoId, actividadId } = req.params;
+    const actividad = actividadService.actualizarConfigEntrega(cursoId, actividadId, req.body);
+    res.status(200).json(actividad);
+  } catch (error) {
+    manejarError(res, error);
+  }
+}
+
+module.exports = { crearActividad, listarPorCurso, actualizarConfigEntrega };

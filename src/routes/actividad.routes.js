@@ -121,6 +121,7 @@ router.get('/', actividadController.listarPorCurso);
  */
 router.post('/:actividadId/entregas', entregaController.entregar);
 
+// Configuración de entrega y reemplazos del docente
 /**
  * @swagger
  * /api/cursos/{cursoId}/actividades/{actividadId}/configuracion-entrega:
