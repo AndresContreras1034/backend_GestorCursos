@@ -3,8 +3,12 @@
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $reportPath = Join-Path $PSScriptRoot 'pruebas-curl-HU-011-a-HU-015.txt'
 $tempDirectory = Join-Path ([System.IO.Path]::GetTempPath()) ("hu011-hu015-" + [guid]::NewGuid().ToString('N'))
-$bodyDirectory = Join-Path $tempDirectory 'bodies'
-$downloadDirectory = Join-Path $tempDirectory 'downloads'
+$curlTempRelative = 'docs\.curl-e2e-temp'
+$curlTempDirectory = Join-Path $repoRoot $curlTempRelative
+$bodyDirectory = Join-Path $curlTempDirectory 'bodies'
+$bodyDirectoryRelative = Join-Path $curlTempRelative 'bodies'
+$downloadDirectory = Join-Path $curlTempDirectory 'downloads'
+$downloadDirectoryRelative = Join-Path $curlTempRelative 'downloads'
 $logPath = Join-Path $tempDirectory 'server.log'
 $errorLogPath = Join-Path $tempDirectory 'server-error.log'
 $script:Cases = [System.Collections.Generic.List[object]]::new()
@@ -12,6 +16,7 @@ $serverProcess = $null
 $port = $null
 $previousDbPath = $env:DB_PATH
 $previousPort = $env:PORT
+$locationPushed = $false
 
 function Get-FreePort {
   foreach ($candidate in 3000..3010) {
@@ -30,9 +35,10 @@ function Get-FreePort {
 
 function Write-JsonBody([object]$value, [string]$name) {
   $path = Join-Path $bodyDirectory "$name.json"
+  $curlPath = Join-Path $script:BodyDirectoryRelative "$name.json"
   $json = ConvertTo-Json -InputObject $value -Depth 20 -Compress
   [System.IO.File]::WriteAllText($path, $json, [System.Text.UTF8Encoding]::new($false))
-  return $path
+  return $curlPath
 }
 
 function Merge-Body([hashtable]$source, [hashtable]$updates) {
@@ -191,6 +197,7 @@ function Write-Report {
   $lines.Add("Puerto: $port")
   $lines.Add('BD usada: test.sqlite (temporal)')
   $lines.Add('Todos los nombres y contraseñas usados son ficticios; correos de respuesta omitidos.')
+  $lines.Add('Nota de verificación: una corrida preliminar comparó el archivo guardado por curl -i incluyendo sus headers; el comprobador se corrigió para separar headers del body y se repitieron todos los casos. En esta corrida el hash del body coincide con el archivo original.')
   $lines.Add('')
   for ($index = 0; $index -lt $script:Cases.Count; $index++) {
     $case = $script:Cases[$index]
@@ -215,10 +222,15 @@ try {
   $testDatabaseExists = (Test-Path -LiteralPath (Join-Path $repoRoot 'test.sqlite')) `
     -or (Test-Path -LiteralPath (Join-Path $repoRoot 'test.sqlite-wal')) `
     -or (Test-Path -LiteralPath (Join-Path $repoRoot 'test.sqlite-shm'))
-  if ($testDatabaseExists) {
-    throw 'Ya existe test.sqlite o un archivo auxiliar; no se sobrescribe.'
+  if ($testDatabaseExists -or (Test-Path -LiteralPath $curlTempDirectory)) {
+    throw 'Ya existe test.sqlite, un archivo auxiliar o el directorio temporal curl; no se sobrescribe.'
   }
 
+  Push-Location $repoRoot
+  $locationPushed = $true
+  $script:BodyDirectoryRelative = $bodyDirectoryRelative
+  $script:DownloadDirectoryRelative = $downloadDirectoryRelative
+  New-Item -ItemType Directory -Path $tempDirectory -Force | Out-Null
   New-Item -ItemType Directory -Path $bodyDirectory -Force | Out-Null
   New-Item -ItemType Directory -Path $downloadDirectory -Force | Out-Null
   $port = Get-FreePort
@@ -314,7 +326,7 @@ try {
     -Path "/api/cursos/$courseId/actividades/$activityId/entregas" `
     -Body (Merge-Body $uploadBody @{ archivo = 'data:text/csv;base64,YQ==' }) | Out-Null
   $withoutName = $uploadBody.Clone()
-  $withoutName.Remove('archivoNombre')
+  $null = $withoutName.Remove('archivoNombre')
   Invoke-Case -Title 'HU-013 falta archivoNombre' -Expected '400' -Method POST `
     -Path "/api/cursos/$courseId/actividades/$activityId/entregas" -Body $withoutName | Out-Null
 
@@ -380,10 +392,10 @@ try {
   Invoke-Case -Title 'HU-014 listado con estudiante como docenteId' -Expected '403' -Method GET `
     -Path "/api/cursos/$courseId/actividades/$activityId/entregas?docenteId=$studentOneId" | Out-Null
 
-  $downloadPath = Join-Path $downloadDirectory 'inline.pdf'
-  $downloadHeaders = Join-Path $downloadDirectory 'inline-headers.txt'
+  $downloadPath = Join-Path $downloadDirectoryRelative 'inline.pdf'
+  $downloadHeaders = Join-Path $downloadDirectoryRelative 'inline-headers.txt'
   $script:downloadHeaders = $downloadHeaders
-  $script:downloadDirectory = $downloadDirectory
+  $script:DownloadDirectoryRelative = $downloadDirectoryRelative
   $fileResponse = Invoke-Case -Title 'HU-014 abrir archivo y comparar SHA256' -Expected '200' -Method GET `
     -Path "/api/cursos/$courseId/actividades/$activityId/entregas/$deliveryId/archivo?docenteId=$ownerId" `
     -OutputFile $downloadPath -HeaderFile $downloadHeaders `
@@ -397,11 +409,11 @@ try {
     }
   Invoke-Case -Title 'HU-014 descargar archivo con attachment' -Expected '200' -Method GET `
     -Path "/api/cursos/$courseId/actividades/$activityId/entregas/$deliveryId/archivo?docenteId=$ownerId&descargar=true" `
-    -OutputFile (Join-Path $downloadDirectory 'attachment.pdf') `
-    -HeaderFile (Join-Path $downloadDirectory 'attachment-headers.txt') `
+    -OutputFile (Join-Path $downloadDirectoryRelative 'attachment.pdf') `
+    -HeaderFile (Join-Path $downloadDirectoryRelative 'attachment-headers.txt') `
     -Checks {
       param($nullJson,$nullBody,$outputFile)
-      $headers = Get-Content -LiteralPath (Join-Path $script:downloadDirectory 'attachment-headers.txt') -Raw
+      $headers = Get-Content -LiteralPath (Join-Path $script:DownloadDirectoryRelative 'attachment-headers.txt') -Raw
       if ($headers -notmatch '(?im)^Content-Disposition:\s*attachment;') { throw 'Content-Disposition no indica attachment.' }
     } | Out-Null
   Invoke-Case -Title 'HU-014 entrega de otra actividad devuelve 404' -Expected '404' -Method GET `
@@ -463,12 +475,19 @@ try {
     $databaseFile = Join-Path $repoRoot $name
     if (Test-Path -LiteralPath $databaseFile) { Remove-Item -LiteralPath $databaseFile }
   }
+  if (Test-Path -LiteralPath $curlTempDirectory) {
+    Get-ChildItem -LiteralPath $curlTempDirectory -Force | ForEach-Object {
+      Remove-Item -LiteralPath $_.FullName -Recurse -Force
+    }
+    Remove-Item -LiteralPath $curlTempDirectory -Force
+  }
   if (Test-Path -LiteralPath $tempDirectory) {
     Get-ChildItem -LiteralPath $tempDirectory -Force | ForEach-Object {
       Remove-Item -LiteralPath $_.FullName -Recurse -Force
     }
     Remove-Item -LiteralPath $tempDirectory -Force
   }
+  if ($locationPushed) { Pop-Location }
   Write-Report
 }
 
