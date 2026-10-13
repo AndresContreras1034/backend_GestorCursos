@@ -1,105 +1,106 @@
 # Prueba curl HU-011 a HU-015
-Fecha: 2026-10-13 11:38:43 -05:00
+Fecha: 2026-10-13 11:41:39 -05:00
 Puerto: 3000
 BD usada: test.sqlite (temporal)
 Todos los nombres y contraseñas usados son ficticios; correos de respuesta omitidos.
+Nota de verificación: una corrida preliminar comparó el archivo guardado por curl -i incluyendo sus headers; el comprobador se corrigió para separar headers del body y se repitieron todos los casos. En esta corrida el hash del body coincide con el archivo original.
 
 ### [1] Registro docente dueño
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-1.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-1.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 290
-ETag: W/"122-LUh2gfsa+v/YvmKGLCmQYL95SvM"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"122-WwyS+SY/y0DoA67FbUU6JhHAJMU"
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"nombre":"Docente","apellido":"Prueba","email":"[correo omitido]","rol":"docente","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:38:35","familiares":[]}
+{"id":1,"nombre":"Docente","apellido":"Prueba","email":"[correo omitido]","rol":"docente","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:41:31","familiares":[]}
 Resultado: OK
 
 ### [2] Registro de segundo docente
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-2.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-2.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 290
-ETag: W/"122-/QxGigWhNHqpY+QhK8cjsW7wn4k"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"122-5EsLRJSL1P8ZcWuHhC3NLMPdjls"
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":2,"nombre":"Segundo","apellido":"Prueba","email":"[correo omitido]","rol":"docente","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:38:35","familiares":[]}
+{"id":2,"nombre":"Segundo","apellido":"Prueba","email":"[correo omitido]","rol":"docente","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:41:31","familiares":[]}
 Resultado: OK
 
 ### [3] Registro estudiante inscrito 1
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-3.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-3.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 301
-ETag: W/"12d-jyMxbKUL5QosX4iMgJCVm+VksHo"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"12d-bDD+FdvDu33T37DQzpOFfJhdUiI"
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":3,"nombre":"Estudiante Uno","apellido":"Prueba","email":"[correo omitido]","rol":"estudiante","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:38:35","familiares":[]}
+{"id":3,"nombre":"Estudiante Uno","apellido":"Prueba","email":"[correo omitido]","rol":"estudiante","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:41:31","familiares":[]}
 Resultado: OK
 
 ### [4] Registro estudiante inscrito 2
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-4.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-4.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 301
-ETag: W/"12d-VRVWMoZoyP20eTyGHL/UtqVJhb4"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"12d-ztZ515gzR/mTkGwch8lmrk/new4"
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":4,"nombre":"Estudiante Dos","apellido":"Prueba","email":"[correo omitido]","rol":"estudiante","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:38:35","familiares":[]}
+{"id":4,"nombre":"Estudiante Dos","apellido":"Prueba","email":"[correo omitido]","rol":"estudiante","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:41:31","familiares":[]}
 Resultado: OK
 
 ### [5] Registro estudiante no inscrito
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-5.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-5.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 303
-ETag: W/"12f-l6YVNWabf9B/GNQga23N1LU+kq4"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"12f-Hq52m8VBIMTsvNAuscuiBSvZjeY"
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":5,"nombre":"Estudiante Tres","apellido":"Prueba","email":"[correo omitido]","rol":"estudiante","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:38:35","familiares":[]}
+{"id":5,"nombre":"Estudiante Tres","apellido":"Prueba","email":"[correo omitido]","rol":"estudiante","tipoDocumento":null,"cedula":null,"fechaNacimiento":"1990-05-20","genero":"otro","telefono":null,"fotoPerfil":null,"ultimoAcceso":null,"fechaCreacion":"2026-10-13 16:41:31","familiares":[]}
 Resultado: OK
 
 ### [6] Login válido
 Esperado: 200
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/login" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-6.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/login" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-6.json"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 120
 ETag: W/"78-iNb/Hx21Pp8WVaxtVkVr0HKgsKU"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -109,14 +110,14 @@ Resultado: OK
 ### [7] Login con contraseña errónea
 Esperado: 401
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/login" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-7.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/login" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-7.json"
 Respuesta:
 HTTP/1.1 401 Unauthorized
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 35
 ETag: W/"23-UHCIAFM/swaAglwgDKKCnq2spSQ"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -126,65 +127,65 @@ Resultado: OK
 ### [8] Crear curso
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-8.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-8.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 203
-ETag: W/"cb-qTbcjKqu7PQtfFSBhl0U2CUA6Ko"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"cb-fxlqBctwXe+BxJjMsfLulUhaElA"
+Date: Tue, 13 Oct 2026 16:41:31 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"nombre":"Curso de prueba HU-011 a HU-015","descripcion":"Curso temporal ficticio","docente_id":1,"imagen_curso":null,"fecha_creacion":"2026-10-13 16:38:35","fecha_actualizacion":null,"activo":1}
+{"id":1,"nombre":"Curso de prueba HU-011 a HU-015","descripcion":"Curso temporal ficticio","docente_id":1,"imagen_curso":null,"fecha_creacion":"2026-10-13 16:41:31","fecha_actualizacion":null,"activo":1}
 Resultado: OK
 
 ### [9] Inscripción del estudiante 1
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-9.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-9.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 99
-ETag: W/"63-0VnHHsCb5Ot78rkOIxoYjVeEpb0"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"63-wYwjlpZECiholBAdz0njXpFOvvQ"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"estudiante_id":3,"curso_id":1,"fecha_inscripcion":"2026-10-13 16:38:35","estado":"activa"}
+{"id":1,"estudiante_id":3,"curso_id":1,"fecha_inscripcion":"2026-10-13 16:41:32","estado":"activa"}
 Resultado: OK
 
 ### [10] Inscripción del estudiante 2
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-10.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-10.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 99
-ETag: W/"63-teqUKcXj8wAvM+6wKRmMqsKYEVk"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"63-Ywy/0K59xlyrh8/viCm+FNi10SQ"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":2,"estudiante_id":4,"curso_id":1,"fecha_inscripcion":"2026-10-13 16:38:35","estado":"activa"}
+{"id":2,"estudiante_id":4,"curso_id":1,"fecha_inscripcion":"2026-10-13 16:41:32","estado":"activa"}
 Resultado: OK
 
 ### [11] Inscripción duplicada
 Esperado: 400
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-11.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-11.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 57
 ETag: W/"39-N2O/1tzdsAsBedVbAxDEXby6H5g"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -194,31 +195,31 @@ Resultado: OK
 ### [12] HU-011 crear actividad publicada
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-12.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-12.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 339
-ETag: W/"153-jatU7ae1gfznercGA8i4IDt8D94"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"153-hY9s64SRiQ3OuXmnQjqMi0IvwaE"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:38:35"}
+{"id":1,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:41:32"}
 Resultado: OK
 
 ### [13] HU-011 fecha límite pasada
 Esperado: 400
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-13.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-13.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 65
 ETag: W/"41-T7LLsEWYCek+3K8To029eShCLbc"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -228,14 +229,14 @@ Resultado: OK
 ### [14] HU-011 docente ajeno al curso
 Esperado: 403
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-14.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-14.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 46
 ETag: W/"2e-IRyMrgPQUQPv2uU/Jsde/SKdeZs"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -251,12 +252,12 @@ HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 442
-ETag: W/"1ba-tj+JThnU0a3c8Z+VyvwUTFItgAo"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"1ba-yTpFcNGilAZ5urEVyMRMmmd1+ZI"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-[{"id":1,"cursoId":1,"cronogramaId":null,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":false,"estadoEntrega":"pendiente","fechaEntrega":null,"entregaTardia":null,"nota":null,"puedeEntregar":true,"puedeReemplazar":false}]
+[{"id":1,"cursoId":1,"cronogramaId":null,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":false,"estadoEntrega":"pendiente","fechaEntrega":null,"entregaTardia":null,"nota":null,"puedeEntregar":true,"puedeReemplazar":false}]
 Resultado: OK
 
 ### [16] HU-012 cronograma para estudiante no inscrito
@@ -269,7 +270,7 @@ X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 69
 ETag: W/"45-7EppJiDRRLSdHkXpdQ/shUYS1NQ"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -285,42 +286,42 @@ HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 359
-ETag: W/"167-nTO+Aktawwdei6Lqdzh/26zdPb0"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"167-Wf7i33aTKgDfp9mMjDEVNNywaoI"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-[{"id":1,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:38:35","totalEntregas":0}]
+[{"id":1,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:41:32","totalEntregas":0}]
 Resultado: OK
 
 ### [18] HU-013 entrega PDF válida
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-18.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-18.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 312
-ETag: W/"138-fGRLrAbW2wbOXuM5zhIW0QYuwYQ"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+ETag: W/"138-zI0c1s1OVJLTnGrxe1ojWxFIwrc"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Primera entrega de prueba","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:38:35.936Z","esTardia":false,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
+{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Primera entrega de prueba","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:41:32.282Z","esTardia":false,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
 Resultado: OK
 
 ### [19] HU-013 entrega desde estudiante no inscrito
 Esperado: 403
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-19.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-19.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 58
 ETag: W/"3a-IchhMtQpg0cTgcsaS/0uK0jOVYg"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -330,14 +331,14 @@ Resultado: OK
 ### [20] HU-013 intento de entrega por docente
 Esperado: 403
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-20.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-20.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 57
 ETag: W/"39-VRkPzUs8UF0oEfTHyZCi95TlSBc"
-Date: Tue, 13 Oct 2026 16:38:35 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -347,14 +348,14 @@ Resultado: OK
 ### [21] HU-013 tipo de archivo no permitido
 Esperado: 400
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-21.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-21.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 40
 ETag: W/"28-wzqaKgqpPftEGJwOS9eqD30ivPU"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -364,14 +365,14 @@ Resultado: OK
 ### [22] HU-013 falta archivoNombre
 Esperado: 400
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-22.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-22.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 65
 ETag: W/"41-FQB9WzFWNwEF/5Kv5OfYQJRKRmg"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -381,31 +382,31 @@ Resultado: OK
 ### [23] HU-011 crear actividad borrador
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-23.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-23.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 337
-ETag: W/"151-NqBDdv6DIlK3nJPdeQiWrXabjg4"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+ETag: W/"151-RwrY8YSp2KQEfsLLmwdxSrcalUQ"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":2,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad borrador","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"borrador","fechaCreacion":"2026-10-13 16:38:36"}
+{"id":2,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad borrador","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"borrador","fechaCreacion":"2026-10-13 16:41:32"}
 Resultado: OK
 
 ### [24] HU-013 entrega en actividad borrador
 Esperado: 403
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/2/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-24.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/2/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-24.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 58
 ETag: W/"3a-2ypLR4vmzLNK3GMN9Y/wW60lePI"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -415,14 +416,14 @@ Resultado: OK
 ### [25] HU-013 reemplazo inicialmente desactivado
 Esperado: 409
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-25.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-25.json"
 Respuesta:
 HTTP/1.1 409 Conflict
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 77
 ETag: W/"4d-qlm/Hx8W+fHWWYhKtBCz6fEfZgI"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -432,48 +433,48 @@ Resultado: OK
 ### [26] HU-013 activar reemplazo de entrega
 Esperado: 200
 Comando:
-curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/actividades/1/configuracion-entrega" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-26.json"
+curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/actividades/1/configuracion-entrega" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-26.json"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 338
-ETag: W/"152-D/5OvDOnynezJRhpbVBPMchPs8c"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+ETag: W/"152-5f2aawzHfB9j6Efhxigc53pXans"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":true,"estado":"publicada","fechaCreacion":"2026-10-13 16:38:35"}
+{"id":1,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":true,"estado":"publicada","fechaCreacion":"2026-10-13 16:41:32"}
 Resultado: OK
 
 ### [27] HU-013 reemplazo permitido
 Esperado: 200
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-27.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-27.json"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 304
-ETag: W/"130-i09qpgFCOA5hDKAUTpE51TMT40g"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+ETag: W/"130-fwTptjojBVitf7jPmo4dizV89XE"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:38:36.181Z","esTardia":false,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
+{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:41:32.542Z","esTardia":false,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
 Resultado: OK
 
 ### [28] HU-013 configurar reemplazo con docente ajeno
 Esperado: 403
 Comando:
-curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/actividades/1/configuracion-entrega" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-28.json"
+curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/actividades/1/configuracion-entrega" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-28.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 46
 ETag: W/"2e-IRyMrgPQUQPv2uU/Jsde/SKdeZs"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -483,14 +484,14 @@ Resultado: OK
 ### [29] HU-013 PATCH de configuración sin campos
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/actividades/1/configuracion-entrega" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-29.json"
+curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/actividades/1/configuracion-entrega" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-29.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 59
 ETag: W/"3b-ykLF3RoU7ekDQA++zEiUFB+lew4"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -500,48 +501,48 @@ Resultado: OK
 ### [30] HU-011 crear actividad tardía no permitida
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-30.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-30.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 337
-ETag: W/"151-SEkQ8jd8cG27OTP+KBm++b4ZkRM"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+ETag: W/"151-7WGeUwsd1NGQJTvjN6WCHtO/Qe8"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":3,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Tardía bloqueada","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:38:41.236Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:38:36"}
+{"id":3,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Tardía bloqueada","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:41:37.603Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:41:32"}
 Resultado: OK
 
 ### [31] HU-011 crear actividad tardía permitida
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-31.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-31.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 336
-ETag: W/"150-+mWBcVnlznMz2i1dr+rp15uxapI"
-Date: Tue, 13 Oct 2026 16:38:36 GMT
+ETag: W/"150-OIqNgHJb9msQ/79O5XiXj9gHwJo"
+Date: Tue, 13 Oct 2026 16:41:32 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":4,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Tardía permitida","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:38:41.264Z","puntajeMaximo":5,"permiteEntregaTardia":true,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:38:36"}
+{"id":4,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Tardía permitida","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:41:37.631Z","puntajeMaximo":5,"permiteEntregaTardia":true,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:41:32"}
 Resultado: OK
 
 ### [32] HU-013 entrega tardía no permitida
 Esperado: 403
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/3/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-32.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/3/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-32.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 60
 ETag: W/"3c-bfsXcbQPZftHs7x38jPPJFkxstk"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -551,52 +552,52 @@ Resultado: OK
 ### [33] HU-013 entrega tardía permitida
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/4/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-33.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/4/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-33.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 311
-ETag: W/"137-Ww4ptv1Tm4/mc6BDGDZ203PHBjE"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+ETag: W/"137-ooZgxjo7DfPH0yOYE8o7PjJdKHo"
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":2,"actividadId":4,"estudianteId":3,"comentario":"Primera entrega de prueba","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:38:42.338Z","esTardia":true,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
+{"id":2,"actividadId":4,"estudianteId":3,"comentario":"Primera entrega de prueba","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:41:38.703Z","esTardia":true,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
 Resultado: OK
 
 ### [34] HU-011 crear actividad para prueba de pertenencia
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-34.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-34.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 334
-ETag: W/"14e-g+RQyEGgGpSsKzqMGh+7+23TRDI"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+ETag: W/"14e-CEWQ47136DZ0l5V5bpOiUcwMdHo"
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":5,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Otra actividad","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:38:42"}
+{"id":5,"cursoId":1,"cronogramaId":null,"creadorId":1,"titulo":"Otra actividad","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estado":"publicada","fechaCreacion":"2026-10-13 16:41:38"}
 Resultado: OK
 
 ### [35] HU-013 entregar archivo en otra actividad
 Esperado: 201
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/5/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-35.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/5/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-35.json"
 Respuesta:
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 312
-ETag: W/"138-iJMqUySMPxrUZF2//rQXKZN5U5k"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+ETag: W/"138-umbiZ8d6F0ahFr38PGPqnnykaiI"
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":3,"actividadId":5,"estudianteId":3,"comentario":"Primera entrega de prueba","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:38:42.396Z","esTardia":false,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
+{"id":3,"actividadId":5,"estudianteId":3,"comentario":"Primera entrega de prueba","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:41:38.759Z","esTardia":false,"estado":"entregada","nota":null,"retroalimentacion":null,"fechaCalificacion":null}
 Resultado: OK
 
 ### [36] HU-014 listado para docente dueño, sin base64 y resumen coherente
@@ -608,12 +609,12 @@ HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 717
-ETag: W/"2cd-dMoH3qjDUXAzjbbK8LkhpJhdPtc"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+ETag: W/"2cd-Wely6+td9Yo6M8OTRXdSaukR6qw"
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"actividad":{"id":1,"titulo":"Actividad principal","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5},"resumen":{"totalEstudiantes":2,"entregaron":1,"noEntregaron":1,"pendientesDeRevision":1},"entregaron":[{"estudianteId":3,"nombre":"Estudiante Uno","apellido":"Prueba","email":"[correo omitido]","entregaId":1,"fechaEntrega":"2026-10-13T16:38:36.181Z","esTardia":false,"estado":"entregada","comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"nota":null,"retroalimentacion":null,"fechaCalificacion":null}],"noEntregaron":[{"estudianteId":4,"nombre":"Estudiante Dos","apellido":"Prueba","email":"[correo omitido]"}]}
+{"actividad":{"id":1,"titulo":"Actividad principal","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5},"resumen":{"totalEstudiantes":2,"entregaron":1,"noEntregaron":1,"pendientesDeRevision":1},"entregaron":[{"estudianteId":3,"nombre":"Estudiante Uno","apellido":"Prueba","email":"[correo omitido]","entregaId":1,"fechaEntrega":"2026-10-13T16:41:32.542Z","esTardia":false,"estado":"entregada","comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"nota":null,"retroalimentacion":null,"fechaCalificacion":null}],"noEntregaron":[{"estudianteId":4,"nombre":"Estudiante Dos","apellido":"Prueba","email":"[correo omitido]"}]}
 Resultado: OK
 
 ### [37] HU-014 listado con docente ajeno
@@ -626,7 +627,7 @@ X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 46
 ETag: W/"2e-IRyMrgPQUQPv2uU/Jsde/SKdeZs"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -643,7 +644,7 @@ X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 56
 ETag: W/"38-ADMmPRWO/Iwm+o/Tv0vE/kCIkyQ"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -653,7 +654,7 @@ Resultado: OK
 ### [39] HU-014 abrir archivo y comparar SHA256
 Esperado: 200
 Comando:
-curl.exe -i -sS -D "C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\downloads\inline-headers.txt" -o "C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\downloads\inline.pdf" "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/archivo?docenteId=1"
+curl.exe -i -sS -D "docs\.curl-e2e-temp\downloads\inline-headers.txt" -o "docs\.curl-e2e-temp\downloads\inline.pdf" "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/archivo?docenteId=1"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
@@ -662,7 +663,7 @@ Content-Disposition: inline; filename="entrega-prueba.pdf"; filename*=UTF-8''ent
 Content-Length: 38
 X-Content-Type-Options: nosniff
 ETag: W/"26-/bE+sWeOrP9oHGcOlz+SbqMPMYI"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 Body binario separado de los headers curl -i; hash SHA256: B069DA6DE922FACFE236510F9AACE7D9C1A03F51A654E0B2D730D06F7D7B3CC9
@@ -671,7 +672,7 @@ Resultado: OK
 ### [40] HU-014 descargar archivo con attachment
 Esperado: 200
 Comando:
-curl.exe -i -sS -D "C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\downloads\attachment-headers.txt" -o "C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\downloads\attachment.pdf" "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/archivo?docenteId=1&descargar=true"
+curl.exe -i -sS -D "docs\.curl-e2e-temp\downloads\attachment-headers.txt" -o "docs\.curl-e2e-temp\downloads\attachment.pdf" "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/archivo?docenteId=1&descargar=true"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
@@ -680,7 +681,7 @@ Content-Disposition: attachment; filename="entrega-prueba.pdf"; filename*=UTF-8'
 Content-Length: 38
 X-Content-Type-Options: nosniff
 ETag: W/"26-/bE+sWeOrP9oHGcOlz+SbqMPMYI"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:38 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 Body binario separado de los headers curl -i; hash SHA256: B069DA6DE922FACFE236510F9AACE7D9C1A03F51A654E0B2D730D06F7D7B3CC9
@@ -696,7 +697,7 @@ X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 33
 ETag: W/"21-AyZdqqR1YQRT6soSJfPZfQNWKq4"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -706,48 +707,48 @@ Resultado: OK
 ### [42] HU-015 calificar con 4.5 y retroalimentación
 Esperado: 200
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-42.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-42.json"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 337
-ETag: W/"151-8/ixNn00+dJJikfyZcQMUJaitY8"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+ETag: W/"151-fLSoX0E4nvQ8NAWvX0CtZd+wxR8"
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:38:36.181Z","esTardia":false,"estado":"calificada","nota":4.5,"retroalimentacion":"Buen trabajo.","fechaCalificacion":"2026-10-13T16:38:42.730Z"}
+{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:41:32.542Z","esTardia":false,"estado":"calificada","nota":4.5,"retroalimentacion":"Buen trabajo.","fechaCalificacion":"2026-10-13T16:41:39.076Z"}
 Resultado: OK
 
 ### [43] HU-015 recalificar y sobrescribir valores
 Esperado: 200
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-43.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-43.json"
 Respuesta:
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 351
-ETag: W/"15f-xoT3Hv5tCH1Xgbf9FrjSaBR8Xp0"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+ETag: W/"15f-jxKS1VDRVWJcEzqrIEaBmkr87Vw"
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:38:36.181Z","esTardia":false,"estado":"calificada","nota":4.25,"retroalimentacion":"Calificación actualizada.","fechaCalificacion":"2026-10-13T16:38:42.766Z"}
+{"id":1,"actividadId":1,"estudianteId":3,"comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"fechaEntrega":"2026-10-13T16:41:32.542Z","esTardia":false,"estado":"calificada","nota":4.25,"retroalimentacion":"Calificación actualizada.","fechaCalificacion":"2026-10-13T16:41:39.110Z"}
 Resultado: OK
 
 ### [44] HU-015 nota superior al máximo 5.5
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-44.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-44.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 42
 ETag: W/"2a-MhBTYiT19owPW00Hshf2KBlxrJE"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -757,14 +758,14 @@ Resultado: OK
 ### [45] HU-015 nota negativa -1
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-45.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-45.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 42
 ETag: W/"2a-MhBTYiT19owPW00Hshf2KBlxrJE"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -774,14 +775,14 @@ Resultado: OK
 ### [46] HU-015 nota string "4"
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-46.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-46.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 56
 ETag: W/"38-O18CvEdkD4GIa0YmD1yWKZiJVBE"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -791,14 +792,14 @@ Resultado: OK
 ### [47] HU-015 nota con tres decimales 4.555
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-47.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-47.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 46
 ETag: W/"2e-jmKtHhr73wVJH1DNtgrUR2cvxgA"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -808,14 +809,14 @@ Resultado: OK
 ### [48] HU-015 nota omitida
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-48.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-48.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 56
 ETag: W/"38-O18CvEdkD4GIa0YmD1yWKZiJVBE"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -825,14 +826,14 @@ Resultado: OK
 ### [49] HU-015 retroalimentación mayor a 1000 caracteres
 Esperado: 400
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-49.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-49.json"
 Respuesta:
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 75
 ETag: W/"4b-LgTWXz0EeEkQ0bChHWFMB2nGPbE"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -842,14 +843,14 @@ Resultado: OK
 ### [50] HU-015 calificación con docente ajeno
 Esperado: 403
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-50.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-50.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 46
 ETag: W/"2e-IRyMrgPQUQPv2uU/Jsde/SKdeZs"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -859,14 +860,14 @@ Resultado: OK
 ### [51] HU-015 calificación con estudiante como docenteId
 Esperado: 403
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-51.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-51.json"
 Respuesta:
 HTTP/1.1 403 Forbidden
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 56
 ETag: W/"38-ADMmPRWO/Iwm+o/Tv0vE/kCIkyQ"
-Date: Tue, 13 Oct 2026 16:38:42 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -876,14 +877,14 @@ Resultado: OK
 ### [52] HU-015 entrega de otra actividad devuelve 404
 Esperado: 404
 Comando:
-curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/3/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-52.json"
+curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/3/calificacion" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-52.json"
 Respuesta:
 HTTP/1.1 404 Not Found
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 33
 ETag: W/"21-AyZdqqR1YQRT6soSJfPZfQNWKq4"
-Date: Tue, 13 Oct 2026 16:38:43 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -893,14 +894,14 @@ Resultado: OK
 ### [53] Regresión HU-013: no reemplazar entrega calificada
 Esperado: 409
 Comando:
-curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\AppData\Local\Temp\hu011-hu015-64590a949c064583b7b9ac8370966ddb\bodies\request-53.json"
+curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@docs\.curl-e2e-temp\bodies\request-53.json"
 Respuesta:
 HTTP/1.1 409 Conflict
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 65
 ETag: W/"41-/ET0R5AdewNvGPY8wQIuNTk1i5k"
-Date: Tue, 13 Oct 2026 16:38:43 GMT
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -916,12 +917,12 @@ HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 764
-ETag: W/"2fc-7LYHp+ltBqXFuOycqJ+fan6N28M"
-Date: Tue, 13 Oct 2026 16:38:43 GMT
+ETag: W/"2fc-VOTZ79ss55vvghbmPe1v8695YGU"
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"actividad":{"id":1,"titulo":"Actividad principal","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5},"resumen":{"totalEstudiantes":2,"entregaron":1,"noEntregaron":1,"pendientesDeRevision":0},"entregaron":[{"estudianteId":3,"nombre":"Estudiante Uno","apellido":"Prueba","email":"[correo omitido]","entregaId":1,"fechaEntrega":"2026-10-13T16:38:36.181Z","esTardia":false,"estado":"calificada","comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"nota":4.25,"retroalimentacion":"Calificación actualizada.","fechaCalificacion":"2026-10-13T16:38:42.766Z"}],"noEntregaron":[{"estudianteId":4,"nombre":"Estudiante Dos","apellido":"Prueba","email":"[correo omitido]"}]}
+{"actividad":{"id":1,"titulo":"Actividad principal","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5},"resumen":{"totalEstudiantes":2,"entregaron":1,"noEntregaron":1,"pendientesDeRevision":0},"entregaron":[{"estudianteId":3,"nombre":"Estudiante Uno","apellido":"Prueba","email":"[correo omitido]","entregaId":1,"fechaEntrega":"2026-10-13T16:41:32.542Z","esTardia":false,"estado":"calificada","comentario":"Reemplazo válido","archivoNombre":"entrega-prueba.pdf","archivoTipo":"application/pdf","archivoTamano":38,"nota":4.25,"retroalimentacion":"Calificación actualizada.","fechaCalificacion":"2026-10-13T16:41:39.110Z"}],"noEntregaron":[{"estudianteId":4,"nombre":"Estudiante Dos","apellido":"Prueba","email":"[correo omitido]"}]}
 Resultado: OK
 
 ### [55] Regresión HU-012: nota visible al estudiante calificado
@@ -933,12 +934,12 @@ HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
 Content-Length: 1822
-ETag: W/"71e-KOYqGkylXxI6K9gRTbt/U1T73Ww"
-Date: Tue, 13 Oct 2026 16:38:43 GMT
+ETag: W/"71e-4hR5149ma8hlbKVKo6Ft9OJ25bc"
+Date: Tue, 13 Oct 2026 16:41:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-[{"id":3,"cursoId":1,"cronogramaId":null,"titulo":"Tardía bloqueada","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:38:41.236Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":false,"estadoEntrega":"vencida","fechaEntrega":null,"entregaTardia":null,"nota":null,"puedeEntregar":false,"puedeReemplazar":false},{"id":4,"cursoId":1,"cronogramaId":null,"titulo":"Tardía permitida","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:38:41.264Z","puntajeMaximo":5,"permiteEntregaTardia":true,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":true,"estadoEntrega":"entregada","fechaEntrega":"2026-10-13T16:38:42.338Z","entregaTardia":true,"nota":null,"puedeEntregar":false,"puedeReemplazar":false},{"id":1,"cursoId":1,"cronogramaId":null,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":true,"estadoActividad":"publicada","entregada":true,"estadoEntrega":"calificada","fechaEntrega":"2026-10-13T16:38:36.181Z","entregaTardia":false,"nota":4.25,"puedeEntregar":false,"puedeReemplazar":false},{"id":5,"cursoId":1,"cronogramaId":null,"titulo":"Otra actividad","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:38:35.742Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":true,"estadoEntrega":"entregada","fechaEntrega":"2026-10-13T16:38:42.396Z","entregaTardia":false,"nota":null,"puedeEntregar":false,"puedeReemplazar":false}]
+[{"id":3,"cursoId":1,"cronogramaId":null,"titulo":"Tardía bloqueada","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:41:37.603Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":false,"estadoEntrega":"vencida","fechaEntrega":null,"entregaTardia":null,"nota":null,"puedeEntregar":false,"puedeReemplazar":false},{"id":4,"cursoId":1,"cronogramaId":null,"titulo":"Tardía permitida","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T16:41:37.631Z","puntajeMaximo":5,"permiteEntregaTardia":true,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":true,"estadoEntrega":"entregada","fechaEntrega":"2026-10-13T16:41:38.703Z","entregaTardia":true,"nota":null,"puedeEntregar":false,"puedeReemplazar":false},{"id":1,"cursoId":1,"cronogramaId":null,"titulo":"Actividad principal","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":true,"estadoActividad":"publicada","entregada":true,"estadoEntrega":"calificada","fechaEntrega":"2026-10-13T16:41:32.542Z","entregaTardia":false,"nota":4.25,"puedeEntregar":false,"puedeReemplazar":false},{"id":5,"cursoId":1,"cronogramaId":null,"titulo":"Otra actividad","instrucciones":"Instrucciones ficticias para la prueba de punta a punta.","fechaLimite":"2026-10-13T17:41:32.081Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"estadoActividad":"publicada","entregada":true,"estadoEntrega":"entregada","fechaEntrega":"2026-10-13T16:41:38.759Z","entregaTardia":false,"nota":null,"puedeEntregar":false,"puedeReemplazar":false}]
 Resultado: OK
 
 ## Resumen
