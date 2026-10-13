@@ -4,16 +4,18 @@ const CAMPOS = `
   a.id, a.curso_id AS cursoId, a.cronograma_id AS cronogramaId,
   a.creador_id AS creadorId, a.titulo, a.instrucciones,
   a.fecha_limite AS fechaLimite, a.puntaje_maximo AS puntajeMaximo,
-  a.permite_entrega_tardia AS permiteEntregaTardia, a.estado,
-  a.fecha_creacion AS fechaCreacion
+  a.permite_entrega_tardia AS permiteEntregaTardia,
+  a.permite_reemplazo_entrega AS permiteReemplazoEntrega,
+  a.estado, a.fecha_creacion AS fechaCreacion
 `;
 
 function crear(d) {
   const resultado = db.prepare(`
     INSERT INTO actividades
       (curso_id, cronograma_id, creador_id, titulo, instrucciones,
-       fecha_limite, puntaje_maximo, permite_entrega_tardia, estado)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       fecha_limite, puntaje_maximo, permite_entrega_tardia,
+       permite_reemplazo_entrega, estado)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     d.cursoId,
     d.cronogramaId ?? null,
@@ -23,6 +25,7 @@ function crear(d) {
     d.fechaLimite,
     d.puntajeMaximo,
     d.permiteEntregaTardia ? 1 : 0,
+    d.permiteReemplazoEntrega ? 1 : 0,
     d.estado
   );
   return buscarPorId(resultado.lastInsertRowid);
@@ -59,4 +62,19 @@ function listarParaEstudiante(cursoId, estudianteId) {
   `).all(estudianteId, cursoId);
 }
 
-module.exports = { crear, buscarPorId, listarParaDocente, listarParaEstudiante };
+function actualizarConfigEntrega(id, { permiteEntregaTardia, permiteReemplazoEntrega }) {
+  db.prepare(`
+    UPDATE actividades
+    SET permite_entrega_tardia = COALESCE(?, permite_entrega_tardia),
+        permite_reemplazo_entrega = COALESCE(?, permite_reemplazo_entrega),
+        fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(
+    permiteEntregaTardia === undefined ? null : (permiteEntregaTardia ? 1 : 0),
+    permiteReemplazoEntrega === undefined ? null : (permiteReemplazoEntrega ? 1 : 0),
+    id
+  );
+  return buscarPorId(id);
+}
+
+module.exports = { crear, buscarPorId, listarParaDocente, listarParaEstudiante, actualizarConfigEntrega };

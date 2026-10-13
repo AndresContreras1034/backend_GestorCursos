@@ -1,5 +1,6 @@
 const express = require('express');
 const actividadController = require('../controllers/actividad.controller');
+const entregaController = require('../controllers/entrega.controller');
 
 /**
  * Router anidado: se monta en /api/cursos/:cursoId/actividades
@@ -32,6 +33,7 @@ const router = express.Router({ mergeParams: true });
  *               fechaLimite: { type: string, example: "2026-12-15T23:59:00-05:00" }
  *               puntajeMaximo: { type: number, example: 5 }
  *               permiteEntregaTardia: { type: boolean }
+ *               permiteReemplazoEntrega: { type: boolean }
  *               cronogramaId: { type: integer, description: Sesión del cronograma (opcional) }
  *               estado: { type: string, enum: [borrador, publicada] }
  *     responses:
@@ -73,5 +75,89 @@ router.post('/', actividadController.crearActividad);
  *         description: Curso o usuario no encontrado
  */
 router.get('/', actividadController.listarPorCurso);
+
+/**
+ * @swagger
+ * /api/cursos/{cursoId}/actividades/{actividadId}/entregas:
+ *   post:
+ *     summary: Entregar una actividad (HU-013)
+ *     tags: [Actividad]
+ *     parameters:
+ *       - in: path
+ *         name: cursoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: actividadId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [estudianteId, archivo, archivoNombre]
+ *             properties:
+ *               estudianteId: { type: integer }
+ *               archivo: { type: string, description: Data URI base64 del archivo }
+ *               archivoNombre: { type: string }
+ *               comentario: { type: string }
+ *     responses:
+ *       200:
+ *         description: Entrega reemplazada
+ *       201:
+ *         description: Entrega creada
+ *       400:
+ *         description: Archivo o validación inválida
+ *       403:
+ *         description: Reglas de negocio no cumplidas
+ *       404:
+ *         description: Curso o actividad no encontrada
+ *       409:
+ *         description: Entrega ya calificada o reemplazo no permitido
+ */
+router.post('/:actividadId/entregas', entregaController.entregar);
+
+/**
+ * @swagger
+ * /api/cursos/{cursoId}/actividades/{actividadId}/configuracion-entrega:
+ *   patch:
+ *     summary: Actualizar la configuración de entrega de una actividad
+ *     tags: [Actividad]
+ *     parameters:
+ *       - in: path
+ *         name: cursoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: actividadId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               docenteId: { type: integer }
+ *               permiteEntregaTardia: { type: boolean }
+ *               permiteReemplazoEntrega: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Configuración actualizada
+ *       400:
+ *         description: Validación inválida
+ *       403:
+ *         description: El docente no es dueño del curso
+ *       404:
+ *         description: Curso o actividad no encontrada
+ */
+router.patch('/:actividadId/configuracion-entrega', actividadController.actualizarConfigEntrega);
 
 module.exports = router;

@@ -14,14 +14,18 @@ function obtenerCursoActivo(cursoId) {
 }
 
 function aBooleanos(a) {
-  return { ...a, permiteEntregaTardia: a.permiteEntregaTardia === 1 };
+  return {
+    ...a,
+    permiteEntregaTardia: a.permiteEntregaTardia === 1,
+    permiteReemplazoEntrega: a.permiteReemplazoEntrega === 1,
+  };
 }
 
 // ---------------- HU-011 ----------------
 function crearActividad(cursoId, datos) {
   const {
     docenteId, titulo, instrucciones, fechaLimite,
-    puntajeMaximo, permiteEntregaTardia, cronogramaId, estado,
+    puntajeMaximo, permiteEntregaTardia, permiteReemplazoEntrega, cronogramaId, estado,
   } = datos;
 
   if (!docenteId) throw new ErrorApp('docenteId es obligatorio');
@@ -54,6 +58,9 @@ function crearActividad(cursoId, datos) {
   if (permiteEntregaTardia !== undefined && typeof permiteEntregaTardia !== 'boolean') {
     throw new ErrorApp('permiteEntregaTardia debe ser true o false');
   }
+  if (permiteReemplazoEntrega !== undefined && typeof permiteReemplazoEntrega !== 'boolean') {
+    throw new ErrorApp('permiteReemplazoEntrega debe ser true o false');
+  }
 
   const estadoFinal = estado ?? 'publicada';
   if (!ESTADOS_CREACION.includes(estadoFinal)) {
@@ -79,6 +86,7 @@ function crearActividad(cursoId, datos) {
     fechaLimite: fechaLimiteDate.toISOString(),
     puntajeMaximo: puntaje,
     permiteEntregaTardia: permiteEntregaTardia === true,
+    permiteReemplazoEntrega: permiteReemplazoEntrega === true,
     estado: estadoFinal,
   });
 
@@ -112,6 +120,7 @@ function listarCronogramaActividades(cursoId, usuarioId) {
   return actividadRepository.listarParaEstudiante(cursoId, usuario.id).map((a) => {
     const entregada = a.entregaId !== null;
     const vencida = new Date(a.fechaLimite) < ahora;
+    const abierta = a.estado === 'publicada' && (!vencida || a.permiteEntregaTardia === 1);
 
     let estadoEntrega;
     if (entregada) estadoEntrega = a.estadoEntrega;        // 'entregada' | 'calificada'
@@ -126,16 +135,51 @@ function listarCronogramaActividades(cursoId, usuarioId) {
       fechaLimite: a.fechaLimite,
       puntajeMaximo: a.puntajeMaximo,
       permiteEntregaTardia: a.permiteEntregaTardia === 1,
+      permiteReemplazoEntrega: a.permiteReemplazoEntrega === 1,
       estadoActividad: a.estado,
       entregada,
       estadoEntrega,
       fechaEntrega: a.fechaEntrega,
       entregaTardia: entregada ? a.entregaTardia === 1 : null,
       nota: a.estadoEntrega === 'calificada' ? a.nota : null,
-      // Para que el frontend sepa si muestra el botón de entregar (HU-013)
-      puedeEntregar: !entregada && a.estado === 'publicada' && (!vencida || a.permiteEntregaTardia === 1),
+      puedeEntregar: !entregada && abierta,
+      puedeReemplazar: entregada && a.estadoEntrega === 'entregada' && a.permiteReemplazoEntrega === 1 && abierta,
     };
   });
 }
 
-module.exports = { crearActividad, listarCronogramaActividades };
+function actualizarConfigEntrega(cursoId, actividadId, datos) {
+  if (!datos || typeof datos !== 'object') {
+    throw new ErrorApp('Debe enviar una configuración válida');
+  }
+
+  const { docenteId, permiteEntregaTardia, permiteReemplazoEntrega } = datos;
+  if (!docenteId) throw new ErrorApp('docenteId es obligatorio');
+
+  const curso = obtenerCursoActivo(cursoId);
+  if (curso.docente_id !== Number(docenteId)) {
+    throw new ErrorApp('No tienes permiso sobre este curso', 403);
+  }
+
+  const actividad = actividadRepository.buscarPorId(actividadId);
+  if (!actividad || actividad.cursoId !== Number(cursoId)) {
+    throw new ErrorApp('Actividad no encontrada', 404);
+  }
+
+  if (permiteEntregaTardia === undefined && permiteReemplazoEntrega === undefined) {
+    throw new ErrorApp('Debe enviar al menos un campo de configuración');
+  }
+  if (permiteEntregaTardia !== undefined && typeof permiteEntregaTardia !== 'boolean') {
+    throw new ErrorApp('permiteEntregaTardia debe ser true o false');
+  }
+  if (permiteReemplazoEntrega !== undefined && typeof permiteReemplazoEntrega !== 'boolean') {
+    throw new ErrorApp('permiteReemplazoEntrega debe ser true o false');
+  }
+
+  return aBooleanos(actividadRepository.actualizarConfigEntrega(actividad.id, {
+    permiteEntregaTardia,
+    permiteReemplazoEntrega,
+  }));
+}
+
+module.exports = { crearActividad, listarCronogramaActividades, actualizarConfigEntrega };
