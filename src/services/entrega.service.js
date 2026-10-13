@@ -45,6 +45,64 @@ function validarArchivo(archivo, archivoNombre) {
 
 const aBooleanos = (e) => ({ ...e, esTardia: e.esTardia === 1 });
 
+function validarDocenteDeActividad(cursoId, actividadId, docenteId) {
+  if (!docenteId) throw new ErrorApp('docenteId es obligatorio');
+
+  const curso = cursoRepository.buscarPorId(cursoId);
+  if (!curso || curso.activo !== 1) throw new ErrorApp('Curso no encontrado', 404);
+
+  const docente = usuarioRepository.buscarPorId(docenteId);
+  if (!docente || !usuarioRepository.estaActivo(docente.id)) {
+    throw new ErrorApp('Docente no encontrado', 404);
+  }
+  if (docente.rol !== 'docente') {
+    throw new ErrorApp('Solo un docente puede consultar las entregas', 403);
+  }
+  if (curso.docente_id !== docente.id) {
+    throw new ErrorApp('No tienes permiso sobre este curso', 403);
+  }
+
+  const actividad = actividadRepository.buscarPorId(actividadId);
+  if (!actividad || actividad.cursoId !== Number(cursoId)) {
+    throw new ErrorApp('Actividad no encontrada', 404);
+  }
+
+  return actividad;
+}
+
+function listarEntregasDeActividad(cursoId, actividadId, docenteId) {
+  const actividad = validarDocenteDeActividad(cursoId, actividadId, docenteId);
+  const estudiantes = entregaRepository.listarEstudiantesConEntrega(cursoId, actividad.id);
+  const entregaron = estudiantes
+    .filter((estudiante) => estudiante.entregaId !== null)
+    .map((estudiante) => aBooleanos(estudiante));
+  const noEntregaron = estudiantes
+    .filter((estudiante) => estudiante.entregaId === null)
+    .map(({ estudianteId, nombre, apellido, email }) => ({
+      estudianteId,
+      nombre,
+      apellido,
+      email,
+    }));
+
+  return {
+    actividad: {
+      id: actividad.id,
+      titulo: actividad.titulo,
+      fechaLimite: actividad.fechaLimite,
+      puntajeMaximo: actividad.puntajeMaximo,
+    },
+    resumen: {
+      totalEstudiantes: estudiantes.length,
+      entregaron: entregaron.length,
+      noEntregaron: noEntregaron.length,
+      pendientesDeRevision: entregaron.filter((entrega) => entrega.estado === 'entregada').length,
+    },
+    entregaron,
+    noEntregaron,
+  };
+}
+
 function entregar(cursoId, actividadId, datos) {
   const { estudianteId, archivo, archivoNombre, comentario } = datos;
   if (!estudianteId) throw new ErrorApp('estudianteId es obligatorio');
@@ -115,4 +173,4 @@ function entregar(cursoId, actividadId, datos) {
   };
 }
 
-module.exports = { entregar };
+module.exports = { entregar, listarEntregasDeActividad };
