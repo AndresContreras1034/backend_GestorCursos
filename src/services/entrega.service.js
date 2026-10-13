@@ -103,6 +103,25 @@ function listarEntregasDeActividad(cursoId, actividadId, docenteId) {
   };
 }
 
+function obtenerArchivoEntrega(cursoId, actividadId, entregaId, docenteId) {
+  validarDocenteDeActividad(cursoId, actividadId, docenteId);
+
+  const entrega = entregaRepository.obtenerArchivo(entregaId);
+  if (!entrega || entrega.actividadId !== Number(actividadId)) {
+    throw new ErrorApp('Entrega no encontrada', 404);
+  }
+  if (typeof entrega.archivo !== 'string' || !entrega.archivo.includes(',')) {
+    throw new ErrorApp('Archivo no encontrado', 404);
+  }
+
+  const [, base64] = entrega.archivo.split(',', 2);
+  return {
+    buffer: Buffer.from(base64, 'base64'),
+    tipo: entrega.archivoTipo,
+    nombre: entrega.archivoNombre,
+  };
+}
+
 function entregar(cursoId, actividadId, datos) {
   const { estudianteId, archivo, archivoNombre, comentario } = datos;
   if (!estudianteId) throw new ErrorApp('estudianteId es obligatorio');
@@ -173,4 +192,4 @@ function entregar(cursoId, actividadId, datos) {
   };
 }
 
-module.exports = { entregar, listarEntregasDeActividad };
+module.exports = { entregar, listarEntregasDeActividad, obtenerArchivoEntrega };
