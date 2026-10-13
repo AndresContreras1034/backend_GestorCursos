@@ -5,7 +5,8 @@ const CAMPOS = `
   e.id, e.actividad_id AS actividadId, e.estudiante_id AS estudianteId,
   e.comentario, e.archivo_nombre AS archivoNombre, e.archivo_tipo AS archivoTipo,
   e.archivo_tamano AS archivoTamano, e.fecha_entrega AS fechaEntrega,
-  e.es_tardia AS esTardia, e.estado
+  e.es_tardia AS esTardia, e.estado, e.nota, e.retroalimentacion,
+  e.fecha_calificacion AS fechaCalificacion
 `;
 
 function buscarPorId(id) {
