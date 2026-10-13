@@ -73,7 +73,8 @@ function listarEstudiantesConEntrega(cursoId, actividadId) {
            e.id AS entregaId, e.fecha_entrega AS fechaEntrega, e.es_tardia AS esTardia,
            e.estado, e.comentario, e.archivo_nombre AS archivoNombre,
            e.archivo_tipo AS archivoTipo, e.archivo_tamano AS archivoTamano,
-           e.nota, e.retroalimentacion
+           e.nota, e.retroalimentacion,
+           e.fecha_calificacion AS fechaCalificacion
     FROM inscripciones i
     JOIN usuarios u ON u.id = i.estudiante_id
     LEFT JOIN entregas e ON e.estudiante_id = u.id AND e.actividad_id = ?
