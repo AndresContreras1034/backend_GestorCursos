@@ -57,4 +57,35 @@ function reemplazar(id, d) {
   return buscarPorId(id);
 }
 
-module.exports = { buscarPorId, buscarPorActividadYEstudiante, crear, reemplazar };
+function listarEstudiantesConEntrega(cursoId, actividadId) {
+  return db.prepare(`
+    SELECT u.id AS estudianteId, u.nombre, u.apellido, u.email,
+           e.id AS entregaId, e.fecha_entrega AS fechaEntrega, e.es_tardia AS esTardia,
+           e.estado, e.comentario, e.archivo_nombre AS archivoNombre,
+           e.archivo_tipo AS archivoTipo, e.archivo_tamano AS archivoTamano,
+           e.nota, e.retroalimentacion
+    FROM inscripciones i
+    JOIN usuarios u ON u.id = i.estudiante_id
+    LEFT JOIN entregas e ON e.estudiante_id = u.id AND e.actividad_id = ?
+    WHERE i.curso_id = ? AND i.estado = 'activa'
+    ORDER BY u.apellido ASC, u.nombre ASC
+  `).all(actividadId, cursoId);
+}
+
+function obtenerArchivo(entregaId) {
+  return db.prepare(`
+    SELECT id, actividad_id AS actividadId, estudiante_id AS estudianteId,
+           archivo, archivo_nombre AS archivoNombre, archivo_tipo AS archivoTipo
+    FROM entregas
+    WHERE id = ?
+  `).get(entregaId);
+}
+
+module.exports = {
+  buscarPorId,
+  buscarPorActividadYEstudiante,
+  crear,
+  reemplazar,
+  listarEstudiantesConEntrega,
+  obtenerArchivo,
+};
