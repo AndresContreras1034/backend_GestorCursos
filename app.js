@@ -10,6 +10,8 @@ const usuarioRoutes = require('./src/routes/usuario.routes');
 
 const cursoRoutes = require('./src/routes/curso.routes');
 
+const cursoGestionRoutes = require('./src/routes/cursoGestion.routes');
+
 const inscripcionRoutes = require('./src/routes/inscripcion.routes');
 
 const cronogramaRoutes = require('./src/routes/cronograma.routes');
@@ -18,7 +20,13 @@ const recursoRoutes = require('./src/routes/recurso.routes');
 
 const actividadRoutes = require('./src/routes/actividad.routes');
 
+const actividadGestionRoutes = require('./src/routes/actividadGestion.routes');
+
 const visorRoutes = require('./src/routes/visor.routes');
+
+const calificacionRoutes = require('./src/routes/calificacion.routes');
+
+const estadisticaRoutes = require('./src/routes/estadistica.routes');
 
 const app = express();
 
@@ -36,6 +44,8 @@ app.use('/api/usuarios', usuarioRoutes);
 
 app.use('/api/cursos', cursoRoutes);
 
+app.use('/api/cursos', cursoGestionRoutes);
+
 app.use('/api/inscripciones', inscripcionRoutes);
 
 app.use('/api/cursos/:cursoId/sesiones', cronogramaRoutes.routerAnidado);
@@ -46,6 +56,20 @@ app.use('/api/recursos', recursoRoutes);
 
 app.use('/api/cursos/:cursoId/actividades', actividadRoutes);
 
+app.use('/api/cursos/:cursoId/actividades', actividadGestionRoutes);
+
+app.use('/api/cursos/:cursoId/calificaciones', calificacionRoutes);
+
+app.use('/api/cursos/:cursoId', estadisticaRoutes);
+
 app.use('/api/recursos', visorRoutes);
+
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'El cuerpo de la petición no es un JSON válido' });
+  }
+  console.error(err);
+  return res.status(500).json({ error: 'Error interno del servidor' });
+});
 
 module.exports = app;
