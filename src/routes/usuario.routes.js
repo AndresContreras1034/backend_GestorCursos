@@ -64,4 +64,24 @@ router.get('/:id', usuarioController.obtenerPerfil);
  */
 router.put('/:id', usuarioController.actualizarPerfil);
 
+/**
+ * @swagger
+ * /api/usuarios/{id}:
+ *   delete:
+ *     summary: Desactivar un usuario (baja lógica)
+ *     tags: [Usuario]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Usuario desactivado; sus datos e historial se conservan
+ *       404:
+ *         description: Usuario no encontrado o ya desactivado
+ */
+router.delete('/:id', usuarioController.desactivarUsuario);
+
 module.exports = router;

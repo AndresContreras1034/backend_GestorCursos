@@ -121,6 +121,14 @@ function estaActivo(id) {
   return usuario?.activo === 1;
 }
 
+function desactivar(id) {
+  db.prepare(`
+    UPDATE usuarios
+    SET activo = 0, fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE id = ? AND activo = 1
+  `).run(id);
+}
+
 function buscarPorCedula(cedula) {
   const stmt = db.prepare(`
     SELECT *
@@ -218,6 +226,7 @@ module.exports = {
   buscarPorEmail,
   buscarPorId,
   estaActivo,
+  desactivar,
   buscarPerfilPorId,
   buscarPorCedula,
   registrarLoginExitoso,

@@ -20,4 +20,13 @@ function actualizarPerfil(req, res) {
   }
 }
 
-module.exports = { obtenerPerfil, actualizarPerfil };
+function desactivarUsuario(req, res) {
+  try {
+    usuarioService.desactivarUsuario(req.params.id);
+    res.status(204).send();
+  } catch (error) {
+    res.status(error.status || 404).json({ error: error.message });
+  }
+}
+
+module.exports = { obtenerPerfil, actualizarPerfil, desactivarUsuario };

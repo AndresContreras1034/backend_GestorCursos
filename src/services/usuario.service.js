@@ -1,8 +1,9 @@
 const usuarioRepository = require('../repository/usuario.repository');
+const { ErrorApp } = require('../utils/errores');
 
 function obtenerPerfil(id) {
   const usuario = usuarioRepository.buscarPorId(id);
-  if (!usuario) {
+  if (!usuario || !usuarioRepository.estaActivo(id)) {
     throw new Error('Usuario no encontrado');
   }
   return usuario;
@@ -16,7 +17,7 @@ function actualizarPerfil(id, datos) {
   }
 
   const usuario = usuarioRepository.buscarPorId(id);
-  if (!usuario) {
+  if (!usuario || !usuarioRepository.estaActivo(id)) {
     throw new Error('Usuario no encontrado');
   }
 
@@ -53,4 +54,12 @@ function actualizarPerfil(id, datos) {
   return actualizado;
 }
 
-module.exports = { obtenerPerfil, actualizarPerfil };
+function desactivarUsuario(id) {
+  const usuario = usuarioRepository.buscarPorId(id);
+  if (!usuario || !usuarioRepository.estaActivo(id)) {
+    throw new ErrorApp('Usuario no encontrado o ya desactivado', 404);
+  }
+  usuarioRepository.desactivar(id);
+}
+
+module.exports = { obtenerPerfil, actualizarPerfil, desactivarUsuario };

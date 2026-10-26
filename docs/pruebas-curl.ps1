@@ -1,7 +1,7 @@
 ﻿$ErrorActionPreference = 'Stop'
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$reportPath = Join-Path $PSScriptRoot 'pruebas-curl-HU-011-a-HU-015.txt'
+$reportPath = Join-Path $PSScriptRoot 'pruebas-curl-unificado.txt'
 $tempDirectory = Join-Path ([System.IO.Path]::GetTempPath()) ("hu011-hu015-" + [guid]::NewGuid().ToString('N'))
 $curlTempRelative = 'docs\.curl-e2e-temp'
 $curlTempDirectory = Join-Path $repoRoot $curlTempRelative
@@ -19,14 +19,15 @@ $previousPort = $env:PORT
 $locationPushed = $false
 
 function Get-FreePort {
-  foreach ($candidate in 3000..3010) {
+  foreach ($candidate in 31000..31100) {
     $listener = $null
     try {
-      $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $candidate)
+      $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::IPv6Any, $candidate)
+      $listener.Server.DualMode = $true
       $listener.Start()
       return $candidate
     } catch {
-      if ($candidate -eq 3010) { throw 'No hay puertos libres entre 3000 y 3010.' }
+      if ($candidate -eq 31100) { throw 'No hay puertos libres entre 31000 y 31100.' }
     } finally {
       if ($listener) { $listener.Stop() }
     }
@@ -192,7 +193,7 @@ function Write-Report {
   $okCount = @($script:Cases | Where-Object Passed).Count
   $failedCount = $script:Cases.Count - $okCount
   $lines = [System.Collections.Generic.List[string]]::new()
-  $lines.Add("# Prueba curl HU-011 a HU-015")
+  $lines.Add("# Pruebas cURL API unificada")
   $lines.Add("Fecha: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')")
   $lines.Add("Puerto: $port")
   $lines.Add('BD usada: test.sqlite (temporal)')
@@ -278,8 +279,73 @@ try {
     -Body @{ email = 'docente-hu011@example.test'; password = 'Incorrecta123' } | Out-Null
 
   $courseResponse = Invoke-Case -Title 'Crear curso' -Expected '201' -Method POST -Path '/api/cursos' `
-    -Body @{ nombre = 'Curso de prueba HU-011 a HU-015'; descripcion = 'Curso temporal ficticio'; docenteId = $ownerId }
+    -Body @{ nombre = 'Curso de prueba API unificada'; descripcion = 'Curso temporal ficticio'; docenteId = $ownerId }
   $courseId = Require-Id $courseResponse 'curso'
+  Invoke-Case -Title 'Consultar detalle del curso' -Expected '200' -Method GET -Path "/api/cursos/$courseId" | Out-Null
+  Invoke-Case -Title 'Actualizar curso' -Expected '200' -Method PUT -Path "/api/cursos/$courseId" `
+    -Body @{ docenteId = $ownerId; descripcion = 'Descripción actualizada por cURL' } | Out-Null
+
+  $offerCourseResponse = Invoke-Case -Title 'Crear curso para oferta educativa' -Expected '201' -Method POST -Path '/api/cursos' `
+    -Body @{ nombre = 'Curso con oferta'; descripcion = 'Curso temporal para validar cupos'; docenteId = $ownerId }
+  $offerCourseId = Require-Id $offerCourseResponse 'curso con oferta'
+  $offerResponse = Invoke-Case -Title 'Crear oferta educativa virtual' -Expected '201' -Method POST `
+    -Path "/api/cursos/$offerCourseId/ofertas" `
+    -Body @{
+      docenteId = $ownerId
+      cupos = 1
+      fechaApertura = '2020-01-01T00:00:00.000Z'
+      fechaCierre = '2099-12-31T23:59:59.000Z'
+      modalidad = 'virtual'
+    }
+  $offerId = Require-Id $offerResponse 'oferta'
+  $script:offerId = $offerId
+  Invoke-Case -Title 'Listar ofertas activas del curso' -Expected '200' -Method GET `
+    -Path "/api/cursos/$offerCourseId/ofertas" -Checks {
+      param($json)
+      if ($json.Count -ne 1 -or $json[0].id -ne $script:offerId) { throw 'No se encontró la oferta creada.' }
+    } | Out-Null
+  $offerEnrollmentResponse = Invoke-Case -Title 'Inscribirse en una oferta con cupo disponible' -Expected '201' -Method POST `
+    -Path '/api/inscripciones' -Body @{ estudianteId = $studentTwoId; ofertaId = $offerId }
+  $offerEnrollmentId = Require-Id $offerEnrollmentResponse 'inscripción de oferta'
+  Invoke-Case -Title 'Rechazar inscripción cuando la oferta está llena' -Expected '400' -Method POST `
+    -Path '/api/inscripciones' -Body @{ estudianteId = $studentThreeId; ofertaId = $offerId } `
+    -Checks { param($json) if ($json.error -notmatch 'cupos') { throw 'Se esperaba un error de cupos.' } } | Out-Null
+  Invoke-Case -Title 'Retirar inscripción de la oferta' -Expected '200' -Method PATCH `
+    -Path "/api/inscripciones/$offerEnrollmentId/retirar" `
+    -Body @{ estudianteId = $studentTwoId }
+  $replacementEnrollmentResponse = Invoke-Case -Title 'Inscribir estudiante después de liberar un cupo' -Expected '201' -Method POST `
+    -Path '/api/inscripciones' -Body @{ estudianteId = $studentThreeId; ofertaId = $offerId }
+  $replacementEnrollmentId = Require-Id $replacementEnrollmentResponse 'segunda inscripción de oferta'
+  Invoke-Case -Title 'Actualizar cupos y modalidad de oferta' -Expected '200' -Method PUT `
+    -Path "/api/ofertas/$offerId" -Body @{ docenteId = $ownerId; cupos = 2; modalidad = 'hibrida' } `
+    -Checks { param($json) if ($json.cupos -ne 2 -or $json.modalidad -ne 'hibrida') { throw 'La oferta no se actualizó.' } } | Out-Null
+  Invoke-Case -Title 'No reducir cupos por debajo de inscripciones activas' -Expected '400' -Method PUT `
+    -Path "/api/ofertas/$offerId" -Body @{ docenteId = $ownerId; cupos = 0 } | Out-Null
+
+  $evaluationResponse = Invoke-Case -Title 'Crear evaluación de curso' -Expected '201' -Method POST `
+    -Path "/api/cursos/$courseId/evaluaciones" `
+    -Body @{
+      docenteId = $ownerId
+      titulo = 'Evaluación integral'
+      descripcion = 'Evaluación del curso creada con cURL'
+      fechaLimite = '2099-12-31T23:59:00.000Z'
+      puntajeMaximo = 100
+    }
+  $evaluationId = Require-Id $evaluationResponse 'evaluación'
+  $script:evaluationId = $evaluationId
+  Invoke-Case -Title 'Listar evaluaciones del curso' -Expected '200' -Method GET `
+    -Path "/api/cursos/$courseId/evaluaciones" -Checks {
+      param($json)
+      if ($json.Count -ne 1 -or $json[0].id -ne $script:evaluationId) { throw 'No se encontró la evaluación creada.' }
+    } | Out-Null
+  Invoke-Case -Title 'Actualizar evaluación de curso' -Expected '200' -Method PUT `
+    -Path "/api/evaluaciones/$evaluationId" -Body @{ docenteId = $ownerId; puntajeMaximo = 90 } `
+    -Checks { param($json) if ($json.puntaje_maximo -ne 90) { throw 'El puntaje máximo no se actualizó.' } } | Out-Null
+
+  Invoke-Case -Title 'Consultar perfil de usuario' -Expected '200' -Method GET -Path "/api/usuarios/$studentThreeId" | Out-Null
+  Invoke-Case -Title 'Actualizar perfil de usuario' -Expected '200' -Method PUT -Path "/api/usuarios/$studentThreeId" `
+    -Body @{ nombre = 'Estudiante Actualizado' } | Out-Null
+
   Invoke-Case -Title 'Inscripción del estudiante 1' -Expected '201' -Method POST -Path '/api/inscripciones' `
     -Body @{ estudianteId = $studentOneId; cursoId = $courseId } | Out-Null
   Invoke-Case -Title 'Inscripción del estudiante 2' -Expected '201' -Method POST -Path '/api/inscripciones' `
@@ -462,6 +528,25 @@ try {
         throw 'La nota o el estado calificado no se ve en el cronograma.'
       }
     } | Out-Null
+
+  Invoke-Case -Title 'Eliminar evaluación de curso' -Expected '204' -Method DELETE `
+    -Path "/api/evaluaciones/$evaluationId" -Body @{ docenteId = $ownerId } | Out-Null
+  Invoke-Case -Title 'Eliminar oferta educativa' -Expected '204' -Method DELETE `
+    -Path "/api/ofertas/$offerId" -Body @{ docenteId = $ownerId } | Out-Null
+  Invoke-Case -Title 'Impedir inscripción directa que evada una oferta desactivada' -Expected '400' -Method POST `
+    -Path '/api/inscripciones' -Body @{ estudianteId = $studentOneId; cursoId = $offerCourseId } `
+    -Checks { param($json) if ($json.error -notmatch 'ofertaId') { throw 'Se esperaba que la oferta fuera obligatoria.' } } | Out-Null
+  Invoke-Case -Title 'Retirar inscripción activa de la oferta' -Expected '200' -Method PATCH `
+    -Path "/api/inscripciones/$replacementEnrollmentId/retirar" `
+    -Body @{ estudianteId = $studentThreeId } | Out-Null
+  Invoke-Case -Title 'Desactivar usuario (baja lógica)' -Expected '204' -Method DELETE `
+    -Path "/api/usuarios/$studentThreeId" | Out-Null
+  Invoke-Case -Title 'Ocultar perfil de usuario desactivado' -Expected '404' -Method GET `
+    -Path "/api/usuarios/$studentThreeId" | Out-Null
+  Invoke-Case -Title 'Impedir login a usuario desactivado' -Expected '401' -Method POST `
+    -Path '/api/auth/login' -Body @{ email = 'estudiante-tres@example.test'; password = 'Prueba123' } | Out-Null
+  Invoke-Case -Title 'Eliminar curso (baja lógica)' -Expected '200' -Method DELETE `
+    -Path "/api/cursos/$offerCourseId" -Body @{ docenteId = $ownerId } | Out-Null
 } catch {
   Write-Error $_
 } finally {

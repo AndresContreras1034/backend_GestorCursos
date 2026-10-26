@@ -7,7 +7,7 @@ const options = {
       title: 'API Plataforma de Cursos',
       version: '1.0.0',
       description:
-        'Documentación de la API - Sprint 1: Crear cuenta, Iniciar sesión, Gestionar perfil, Crear curso',
+        'API REST para la gestión de cursos, ofertas, sesiones, actividades, entregas, evaluación y retroalimentación, progreso y estadísticas.',
     },
     servers: [
       {
