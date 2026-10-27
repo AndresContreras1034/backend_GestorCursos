@@ -28,6 +28,8 @@ const calificacionRoutes = require('./src/routes/calificacion.routes');
 const estadisticaRoutes = require('./src/routes/estadistica.routes');
 const ofertaRoutes = require('./src/routes/oferta.routes');
 const evaluacionRoutes = require('./src/routes/evaluacion.routes');
+const organizacionRoutes = require('./src/routes/organizacion.routes');
+const matriculaRoutes = require('./src/routes/matricula.routes');
 
 const app = express();
 
@@ -60,6 +62,8 @@ app.use('/api/cursos/:cursoId/actividades', actividadRoutes);
 app.use('/api/cursos/:cursoId/actividades', actividadGestionRoutes);
 
 app.use('/api/cursos/:cursoId/calificaciones', calificacionRoutes);
+app.use('/api/cursos/:cursoId', organizacionRoutes);
+app.use('/api/cursos/:cursoId', matriculaRoutes);
 app.use('/api/cursos/:cursoId', estadisticaRoutes);
 app.use('/api/cursos/:cursoId/ofertas', ofertaRoutes.routerAnidado);
 app.use('/api/ofertas', ofertaRoutes.routerPlano);

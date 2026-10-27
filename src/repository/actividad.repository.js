@@ -6,6 +6,7 @@ const CAMPOS = `
   a.fecha_limite AS fechaLimite, a.puntaje_maximo AS puntajeMaximo,
   a.permite_entrega_tardia AS permiteEntregaTardia,
   a.permite_reemplazo_entrega AS permiteReemplazoEntrega,
+  a.corte_id AS corteId, a.tematica_id AS tematicaId,
   a.estado, a.fecha_creacion AS fechaCreacion
 `;
 
@@ -14,8 +15,8 @@ function crear(d) {
     INSERT INTO actividades
       (curso_id, cronograma_id, creador_id, titulo, instrucciones,
        fecha_limite, puntaje_maximo, permite_entrega_tardia,
-       permite_reemplazo_entrega, estado)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       permite_reemplazo_entrega, estado, corte_id, tematica_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     d.cursoId,
     d.cronogramaId ?? null,
@@ -26,7 +27,9 @@ function crear(d) {
     d.puntajeMaximo,
     d.permiteEntregaTardia ? 1 : 0,
     d.permiteReemplazoEntrega ? 1 : 0,
-    d.estado
+    d.estado,
+    d.corteId ?? null,
+    d.tematicaId ?? null
   );
   return buscarPorId(resultado.lastInsertRowid);
 }

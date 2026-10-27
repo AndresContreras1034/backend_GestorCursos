@@ -1,11 +1,24 @@
 const repo = require('../repository/cursoGestion.repository');
+const organizacionService = require('./organizacion.service');
 const { ErrorApp } = require('../utils/errores');
 
-function obtenerCurso(id) {
+// usuarioId (opcional): un borrador solo lo ve su docente
+function obtenerCurso(id, usuarioId) {
   const curso = repo.obtenerDetalle(id);
   if (!curso || curso.activo !== 1) throw new ErrorApp('Curso no encontrado', 404);
-  const { activo, ...resto } = curso;
-  return resto;
+  if (curso.estado === 'borrador' && curso.docenteId !== Number(usuarioId)) {
+    throw new ErrorApp('Curso no encontrado', 404);
+  }
+
+  const { activo, ubicacionNombre, latitud, longitud, ...resto } = curso;
+  return {
+    ...resto,
+    ubicacion: ubicacionNombre ? { nombre: ubicacionNombre, latitud, longitud } : null,
+    cuposDisponibles: curso.cupoMaximo === null
+      ? null
+      : Math.max(0, curso.cupoMaximo - curso.totalEstudiantes),
+    organizacion: organizacionService.obtenerOrganizacion(curso.id),
+  };
 }
 
 function eliminarCurso(id, docenteId) {

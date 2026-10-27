@@ -3,6 +3,7 @@ const cursoRepository = require('../repository/curso.repository');
 const usuarioRepository = require('../repository/usuario.repository');
 const ofertaRepository = require('../repository/oferta.repository');
 const { ErrorApp } = require('../utils/errores');
+const matriculaService = require('./matricula.service');
 
 function inscribirse(datos) {
   const { estudianteId, ofertaId } = datos;
@@ -56,6 +57,9 @@ function inscribirse(datos) {
     throw new ErrorApp('El estudiante ya completó este curso');
   }
 
+  // Estado del curso y cupo máximo (si no hay cupo, el estudiante puede unirse a la lista de espera)
+  matriculaService.validarDisponibilidadCurso(curso);
+
   if (oferta) {
     return inscripcionRepository.crearConCupo({
       estudianteId,
@@ -89,7 +93,9 @@ function retirarInscripcion(id, estudianteId) {
     throw new ErrorApp('La inscripción no pertenece al estudiante indicado', 403);
   }
 
-  return inscripcionRepository.retirar(id);
+  const retirada = inscripcionRepository.retirar(id);
+  matriculaService.promoverDeEspera(inscripcion.curso_id);   // el primero de la lista de espera ocupa el cupo
+  return retirada;
 }
 
 module.exports = { inscribirse, listarPorEstudiante, retirarInscripcion };

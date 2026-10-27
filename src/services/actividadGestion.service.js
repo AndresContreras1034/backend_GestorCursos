@@ -2,6 +2,7 @@ const repo = require('../repository/actividadGestion.repository');
 const cursoRepository = require('../repository/curso.repository');
 const cronogramaRepository = require('../repository/cronograma.repository');
 const { ErrorApp } = require('../utils/errores');
+const organizacionService = require('./organizacion.service');
 
 const ESTADOS = ['borrador', 'publicada', 'cerrada'];
 
@@ -84,6 +85,22 @@ function actualizarActividad(cursoId, actividadId, datos = {}) {
       }
       campos.cronogramaId = sesion.id;
     }
+  }
+
+  // Corte y temática: se revalidan si cambia el corte, la temática o la fecha límite
+  if (datos.corteId !== undefined || datos.tematicaId !== undefined || datos.fechaLimite !== undefined) {
+    const corteFinal = datos.corteId !== undefined ? datos.corteId : actividad.corteId;
+    let tematicaFinal = datos.tematicaId !== undefined ? datos.tematicaId : actividad.tematicaId;
+    if (datos.corteId !== undefined && datos.tematicaId === undefined && corteFinal !== actividad.corteId) {
+      tematicaFinal = null;   // al cambiar de corte la temática anterior ya no aplica
+    }
+    const org = organizacionService.resolverCorteYTematica(cursoId, {
+      corteId: corteFinal,
+      tematicaId: tematicaFinal,
+      fechaLimite: campos.fechaLimite ?? actividad.fechaLimite,
+    });
+    campos.corteId = org.corteId;
+    campos.tematicaId = org.tematicaId;
   }
 
   if (Object.keys(campos).length === 0) {

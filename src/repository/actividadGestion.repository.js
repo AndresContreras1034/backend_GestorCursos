@@ -6,6 +6,8 @@ const COLUMNAS = {
   fechaLimite: 'fecha_limite',
   puntajeMaximo: 'puntaje_maximo',
   cronogramaId: 'cronograma_id',
+  corteId: 'corte_id',
+  tematicaId: 'tematica_id',
   estado: 'estado',
   permiteEntregaTardia: 'permite_entrega_tardia',
   permiteReemplazoEntrega: 'permite_reemplazo_entrega',
@@ -14,6 +16,7 @@ const COLUMNAS = {
 function buscarPorId(id) {
   return db.prepare(`
     SELECT id, curso_id AS cursoId, cronograma_id AS cronogramaId, creador_id AS creadorId,
+           corte_id AS corteId, tematica_id AS tematicaId,
            titulo, instrucciones, fecha_limite AS fechaLimite, puntaje_maximo AS puntajeMaximo,
            permite_entrega_tardia AS permiteEntregaTardia,
            permite_reemplazo_entrega AS permiteReemplazoEntrega,

@@ -4,6 +4,7 @@ const cronogramaRepository = require('../repository/cronograma.repository');
 const usuarioRepository = require('../repository/usuario.repository');
 const inscripcionRepository = require('../repository/inscripcion.repository');
 const { ErrorApp } = require('../utils/errores');
+const organizacionService = require('./organizacion.service');
 
 const ESTADOS_CREACION = ['borrador', 'publicada'];
 
@@ -25,7 +26,7 @@ function aBooleanos(a) {
 function crearActividad(cursoId, datos) {
   const {
     docenteId, titulo, instrucciones, fechaLimite,
-    puntajeMaximo, permiteEntregaTardia, permiteReemplazoEntrega, cronogramaId, estado,
+    puntajeMaximo, permiteEntregaTardia, permiteReemplazoEntrega, cronogramaId, estado, corteId, tematicaId,
   } = datos;
 
   if (!docenteId) throw new ErrorApp('docenteId es obligatorio');
@@ -77,8 +78,17 @@ function crearActividad(cursoId, datos) {
     cronogramaFinal = sesion.id;
   }
 
+  if (curso.estado === 'finalizado') {
+    throw new ErrorApp('El curso está finalizado: no se pueden crear actividades', 409);
+  }
+  const organizacion = organizacionService.resolverCorteYTematica(cursoId, {
+    corteId, tematicaId, fechaLimite: fechaLimiteDate.toISOString(),
+  });
+
   const creada = actividadRepository.crear({
     cursoId: Number(cursoId),
+    corteId: organizacion.corteId,
+    tematicaId: organizacion.tematicaId,
     cronogramaId: cronogramaFinal,
     creadorId: Number(docenteId),
     titulo: titulo.trim(),
@@ -130,6 +140,8 @@ function listarCronogramaActividades(cursoId, usuarioId) {
       id: a.id,
       cursoId: a.cursoId,
       cronogramaId: a.cronogramaId,
+      corteId: a.corteId,
+      tematicaId: a.tematicaId,
       titulo: a.titulo,
       instrucciones: a.instrucciones,
       fechaLimite: a.fechaLimite,

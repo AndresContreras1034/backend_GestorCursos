@@ -6,7 +6,7 @@ function manejarError(res, error) {
 
 function obtenerCurso(req, res) {
   try {
-    res.status(200).json(service.obtenerCurso(req.params.id));
+    res.status(200).json(service.obtenerCurso(req.params.id, req.query.usuarioId));
   } catch (error) {
     manejarError(res, error);
   }
