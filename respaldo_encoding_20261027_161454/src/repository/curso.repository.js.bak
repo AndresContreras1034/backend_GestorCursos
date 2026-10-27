@@ -1,0 +1,116 @@
+const db = require('../database/connection');
+const organizacionRepository = require('./organizacion.repository');
+
+function buscarPorId(id) {
+  return db.prepare('SELECT * FROM cursos WHERE id = ?').get(id);
+}
+
+// Crea el curso y toda su organizaciÃ³n en UNA transacciÃ³n
+const crearCompleto = db.transaction((c, { cortes, horarios, tematicas, insertarTematicas }) => {
+  const r = db.prepare(`
+    INSERT INTO cursos
+      (nombre, descripcion, docente_id, imagen_curso, modalidad, semestre, codigo, estado,
+       ubicacion_nombre, latitud, longitud, enlace_virtual, nota_minima, cupo_maximo)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    c.nombre, c.descripcion, c.docenteId, c.imagenCurso ?? null, c.modalidad, c.semestre,
+    c.codigo ?? null, c.estado, c.ubicacionNombre ?? null, c.latitud ?? null,
+    c.longitud ?? null, c.enlaceVirtual ?? null, c.notaMinima, c.cupoMaximo ?? null
+  );
+  const cursoId = Number(r.lastInsertRowid);
+  organizacionRepository.insertarCortes(cursoId, cortes);
+  organizacionRepository.insertarHorarios(cursoId, horarios);
+  insertarTematicas(cursoId, tematicas);
+  return cursoId;
+});
+
+function listarTodos(busqueda, { docenteId, estado } = {}) {
+  let query = `
+    SELECT c.id, c.nombre, c.descripcion, c.docente_id AS docenteId,
+           c.imagen_curso AS imagenCurso, u.nombre AS docenteNombre, u.apellido AS docenteApellido,
+           c.modalidad, c.semestre, c.codigo, c.estado, c.ubicacion_nombre AS ubicacionNombre,
+           c.cupo_maximo AS cupoMaximo,
+           (SELECT COUNT(*) FROM inscripciones i
+             WHERE i.curso_id = c.id AND i.estado = 'activa') AS totalEstudiantes
+    FROM cursos c
+    JOIN usuarios u ON c.docente_id = u.id
+    WHERE c.activo = 1
+  `;
+  const params = [];
+
+  if (docenteId) {
+    query += ' AND c.docente_id = ?';
+    params.push(Number(docenteId));
+  } else {
+    query += " AND c.estado != 'borrador'";   // los borradores solo los ve su docente
+  }
+  if (estado) {
+    query += ' AND c.estado = ?';
+    params.push(estado);
+  }
+  if (busqueda) {
+    query += ' AND (c.nombre LIKE ? OR c.descripcion LIKE ? OR u.nombre LIKE ? OR c.codigo LIKE ?)';
+    const like = `%${busqueda}%`;
+    params.push(like, like, like, like);
+  }
+  query += ' ORDER BY c.id DESC';
+
+  return db.prepare(query).all(...params).map((c) => ({
+    ...c,
+    cuposDisponibles: c.cupoMaximo === null ? null : Math.max(0, c.cupoMaximo - c.totalEstudiantes),
+  }));
+}
+
+const COLUMNAS_ACTUALIZABLES = {
+  nombre: 'nombre',
+  descripcion: 'descripcion',
+  imagenCurso: 'imagen_curso',
+  modalidad: 'modalidad',
+  semestre: 'semestre',
+  codigo: 'codigo',
+  ubicacionNombre: 'ubicacion_nombre',
+  latitud: 'latitud',
+  longitud: 'longitud',
+  enlaceVirtual: 'enlace_virtual',
+  notaMinima: 'nota_minima',
+  cupoMaximo: 'cupo_maximo',
+};
+
+function actualizar(id, datos) {
+  const campos = [];
+  const valores = [];
+
+  for (const [campoJs, columnaDb] of Object.entries(COLUMNAS_ACTUALIZABLES)) {
+    if (datos[campoJs] !== undefined) {
+      campos.push(`${columnaDb} = ?`);
+      valores.push(datos[campoJs]);
+    }
+  }
+  campos.push('fecha_actualizacion = CURRENT_TIMESTAMP');
+
+  db.prepare(`UPDATE cursos SET ${campos.join(', ')} WHERE id = ?`).run(...valores, id);
+  return buscarPorId(id);
+}
+
+// Cambia el estado; al finalizar cierra todo lo que queda abierto
+const cambiarEstado = db.transaction((id, estado) => {
+  db.prepare(`
+    UPDATE cursos SET estado = ?, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = ?
+  `).run(estado, id);
+
+  if (estado === 'finalizado') {
+    db.prepare(`
+      UPDATE inscripciones SET estado = 'completada' WHERE curso_id = ? AND estado = 'activa'
+    `).run(id);
+    db.prepare(`
+      UPDATE lista_espera SET estado = 'cancelada' WHERE curso_id = ? AND estado = 'esperando'
+    `).run(id);
+    db.prepare(`
+      UPDATE actividades SET estado = 'cerrada', fecha_actualizacion = CURRENT_TIMESTAMP
+      WHERE curso_id = ? AND estado = 'publicada'
+    `).run(id);
+  }
+  return buscarPorId(id);
+});
+
+module.exports = { crearCompleto, buscarPorId, listarTodos, actualizar, cambiarEstado };

@@ -1,4 +1,4 @@
-﻿===== database/init.sql =====
+===== database/init.sql =====
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
@@ -105,7 +105,7 @@ async function registrar(datos) {
 
   const existente = usuarioRepository.buscarPorEmail(email);
   if (existente) {
-    throw new Error('El correo ya estÃ¡ registrado');
+    throw new Error('El correo ya está registrado');
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -123,12 +123,12 @@ async function registrar(datos) {
 async function login(email, password) {
   const usuario = usuarioRepository.buscarPorEmail(email);
   if (!usuario) {
-    throw new Error('Credenciales invÃ¡lidas');
+    throw new Error('Credenciales inválidas');
   }
 
   const esValido = await bcrypt.compare(password, usuario.password);
   if (!esValido) {
-    throw new Error('Credenciales invÃ¡lidas');
+    throw new Error('Credenciales inválidas');
   }
 
   return {
@@ -172,7 +172,7 @@ const authController = require('../controllers/auth.controller');
  *       201:
  *         description: Usuario creado exitosamente
  *       400:
- *         description: Error de validaciÃ³n
+ *         description: Error de validación
  */
 router.post('/register', authController.registrar);
 
@@ -180,7 +180,7 @@ router.post('/register', authController.registrar);
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Iniciar sesiÃ³n
+ *     summary: Iniciar sesión
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -197,7 +197,7 @@ router.post('/register', authController.registrar);
  *       200:
  *         description: Login exitoso
  *       401:
- *         description: Credenciales invÃ¡lidas
+ *         description: Credenciales inválidas
  */
 router.post('/login', authController.login);
 
@@ -254,7 +254,7 @@ function inscribirse(datos) {
 
   const existente = inscripcionRepository.buscarPorEstudianteYCurso(estudianteId, cursoId);
   if (existente) {
-    throw new Error('El estudiante ya estÃ¡ inscrito en este curso');
+    throw new Error('El estudiante ya está inscrito en este curso');
   }
 
   return inscripcionRepository.crear({ estudianteId, cursoId });
@@ -330,9 +330,9 @@ const inscripcionController = require('../controllers/inscripcion.controller');
  *                 type: integer
  *     responses:
  *       201:
- *         description: InscripciÃ³n creada exitosamente
+ *         description: Inscripción creada exitosamente
  *       400:
- *         description: Curso no encontrado, rol invÃ¡lido o ya inscrito
+ *         description: Curso no encontrado, rol inválido o ya inscrito
  */
 router.post('/', inscripcionController.inscribirse);
 
@@ -340,7 +340,7 @@ router.post('/', inscripcionController.inscribirse);
  * @swagger
  * /api/inscripciones/estudiante/{estudianteId}:
  *   get:
- *     summary: Listar los cursos en los que estÃ¡ inscrito un estudiante
+ *     summary: Listar los cursos en los que está inscrito un estudiante
  *     tags: [Inscripcion]
  *     parameters:
  *       - in: path
@@ -465,7 +465,7 @@ function crearCurso(datos) {
   const { nombre, descripcion, docenteId } = datos;
 
   if (!nombre || !descripcion || !docenteId) {
-    throw new Error('Nombre, descripciÃ³n y docente son obligatorios');
+    throw new Error('Nombre, descripción y docente son obligatorios');
   }
 
   const nuevoCurso = cursoRepository.crear({
@@ -543,7 +543,7 @@ const cursoController = require('../controllers/curso.controller');
  *       201:
  *         description: Curso creado exitosamente
  *       400:
- *         description: Error de validaciÃ³n
+ *         description: Error de validación
  */
 router.post('/', cursoController.crearCurso);
 
@@ -551,14 +551,14 @@ router.post('/', cursoController.crearCurso);
  * @swagger
  * /api/cursos:
  *   get:
- *     summary: Consultar cursos disponibles, con filtro/bÃºsqueda opcional
+ *     summary: Consultar cursos disponibles, con filtro/búsqueda opcional
  *     tags: [Curso]
  *     parameters:
  *       - in: query
  *         name: busqueda
  *         schema:
  *           type: string
- *         description: Filtra por nombre, descripciÃ³n o nombre del docente
+ *         description: Filtra por nombre, descripción o nombre del docente
  *     responses:
  *       200:
  *         description: Lista de cursos
@@ -569,7 +569,7 @@ router.get('/', cursoController.listarCursos);
  * @swagger
  * /api/cursos/{id}:
  *   put:
- *     summary: Editar informaciÃ³n de un curso (HU-004)
+ *     summary: Editar información de un curso (HU-004)
  *     tags: [Curso]
  *     parameters:
  *       - in: path
@@ -596,7 +596,7 @@ router.get('/', cursoController.listarCursos);
  *       200:
  *         description: Curso actualizado exitosamente
  *       400:
- *         description: Error de validaciÃ³n, curso no encontrado o sin permiso
+ *         description: Error de validación, curso no encontrado o sin permiso
  */
 router.put('/:id', cursoController.actualizarCurso);
 

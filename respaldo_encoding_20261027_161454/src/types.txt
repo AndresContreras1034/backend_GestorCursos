@@ -1,0 +1,603 @@
+﻿===== database/init.sql =====
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    rol TEXT NOT NULL CHECK (rol IN ('estudiante', 'docente')),
+    cedula TEXT UNIQUE,
+    fecha_nacimiento TEXT,
+    foto_perfil TEXT,
+    fecha_creacion TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TEXT,
+    ultimo_login TEXT,
+    activo INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS cursos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    descripcion TEXT NOT NULL,
+    docente_id INTEGER NOT NULL,
+    imagen_curso TEXT,
+    fecha_creacion TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TEXT,
+    activo INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (docente_id) REFERENCES usuarios(id)
+);
+
+CREATE TABLE IF NOT EXISTS inscripciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    estudiante_id INTEGER NOT NULL,
+    curso_id INTEGER NOT NULL,
+    fecha_inscripcion TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    estado TEXT NOT NULL DEFAULT 'activa' CHECK (estado IN ('activa','retirada','completada')),
+    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id),
+    FOREIGN KEY (curso_id) REFERENCES cursos(id),
+    UNIQUE (estudiante_id, curso_id)
+);
+
+CREATE TABLE IF NOT EXISTS cronograma (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    curso_id INTEGER NOT NULL,
+    titulo TEXT NOT NULL,
+    descripcion TEXT,
+    fecha_inicio TEXT,
+    fecha_fin TEXT,
+    orden INTEGER NOT NULL DEFAULT 0,
+    fecha_creacion TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TEXT,
+    activo INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (curso_id) REFERENCES cursos(id)
+);
+
+===== database/connection.js =====
+const Database = require('better-sqlite3');
+const fs = require('fs');
+const path = require('path');
+
+const dbPath = path.join(__dirname, '..', '..', 'database.sqlite');
+const db = new Database(dbPath);
+
+// Ejecutar init.sql para crear las tablas si no existen
+const initSql = fs.readFileSync(
+  path.join(__dirname, 'init.sql'),
+  'utf8'
+);
+db.exec(initSql);
+
+module.exports = db;
+
+===== controllers/auth.controller.js =====
+const authService = require('../services/auth.service');
+
+async function registrar(req, res) {
+  try {
+    const nuevoUsuario = await authService.registrar(req.body);
+    res.status(201).json(nuevoUsuario);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+    const usuario = await authService.login(email, password);
+    res.status(200).json(usuario);
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+}
+
+module.exports = { registrar, login };
+
+===== services/auth.service.js =====
+const bcrypt = require('bcrypt');
+const usuarioRepository = require('../repository/usuario.repository');
+
+async function registrar(datos) {
+  const { nombre, email, password, rol } = datos;
+
+  if (!nombre || !email || !password || !rol) {
+    throw new Error('Todos los campos son obligatorios');
+  }
+
+  const existente = usuarioRepository.buscarPorEmail(email);
+  if (existente) {
+    throw new Error('El correo ya estÃ¡ registrado');
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const nuevoUsuario = usuarioRepository.crear({
+    nombre,
+    email,
+    password: passwordHash,
+    rol,
+  });
+
+  return nuevoUsuario;
+}
+
+async function login(email, password) {
+  const usuario = usuarioRepository.buscarPorEmail(email);
+  if (!usuario) {
+    throw new Error('Credenciales invÃ¡lidas');
+  }
+
+  const esValido = await bcrypt.compare(password, usuario.password);
+  if (!esValido) {
+    throw new Error('Credenciales invÃ¡lidas');
+  }
+
+  return {
+    id: usuario.id,
+    nombre: usuario.nombre,
+    email: usuario.email,
+    rol: usuario.rol,
+  };
+}
+
+module.exports = { registrar, login };
+
+===== routes/auth.routes.js =====
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/auth.controller');
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Crear una nueva cuenta de usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               rol:
+ *                 type: string
+ *                 enum: [estudiante, docente]
+ *     responses:
+ *       201:
+ *         description: Usuario creado exitosamente
+ *       400:
+ *         description: Error de validaciÃ³n
+ */
+router.post('/register', authController.registrar);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Iniciar sesiÃ³n
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *       401:
+ *         description: Credenciales invÃ¡lidas
+ */
+router.post('/login', authController.login);
+
+module.exports = router;
+
+===== controllers/inscripcion.controller.js =====
+const inscripcionService = require('../services/inscripcion.service');
+
+function inscribirse(req, res) {
+  try {
+    const nuevaInscripcion = inscripcionService.inscribirse(req.body);
+    res.status(201).json(nuevaInscripcion);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+function listarPorEstudiante(req, res) {
+  try {
+    const { estudianteId } = req.params;
+    const inscripciones = inscripcionService.listarPorEstudiante(estudianteId);
+    res.status(200).json(inscripciones);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+module.exports = { inscribirse, listarPorEstudiante };
+
+===== services/inscripcion.service.js =====
+const inscripcionRepository = require('../repository/inscripcion.repository');
+const cursoRepository = require('../repository/curso.repository');
+const usuarioRepository = require('../repository/usuario.repository');
+
+function inscribirse(datos) {
+  const { estudianteId, cursoId } = datos;
+
+  if (!estudianteId || !cursoId) {
+    throw new Error('estudianteId y cursoId son obligatorios');
+  }
+
+  const estudiante = usuarioRepository.buscarPorId(estudianteId);
+  if (!estudiante) {
+    throw new Error('Estudiante no encontrado');
+  }
+  if (estudiante.rol !== 'estudiante') {
+    throw new Error('Solo un usuario con rol estudiante puede inscribirse');
+  }
+
+  const curso = cursoRepository.buscarPorId(cursoId);
+  if (!curso || curso.activo !== 1) {
+    throw new Error('Curso no encontrado');
+  }
+
+  const existente = inscripcionRepository.buscarPorEstudianteYCurso(estudianteId, cursoId);
+  if (existente) {
+    throw new Error('El estudiante ya estÃ¡ inscrito en este curso');
+  }
+
+  return inscripcionRepository.crear({ estudianteId, cursoId });
+}
+
+function listarPorEstudiante(estudianteId) {
+  if (!estudianteId) {
+    throw new Error('estudianteId es obligatorio');
+  }
+  return inscripcionRepository.listarPorEstudiante(estudianteId);
+}
+
+module.exports = { inscribirse, listarPorEstudiante };
+
+===== repository/inscripcion.repository.js =====
+const db = require('../database/connection');
+
+function crear({ estudianteId, cursoId }) {
+  const stmt = db.prepare(`
+    INSERT INTO inscripciones (estudiante_id, curso_id)
+    VALUES (?, ?)
+  `);
+  const resultado = stmt.run(estudianteId, cursoId);
+  return buscarPorId(resultado.lastInsertRowid);
+}
+
+function buscarPorId(id) {
+  const stmt = db.prepare('SELECT * FROM inscripciones WHERE id = ?');
+  return stmt.get(id);
+}
+
+function buscarPorEstudianteYCurso(estudianteId, cursoId) {
+  const stmt = db.prepare(`
+    SELECT * FROM inscripciones WHERE estudiante_id = ? AND curso_id = ? AND estado = 'activa'
+  `);
+  return stmt.get(estudianteId, cursoId);
+}
+
+function listarPorEstudiante(estudianteId) {
+  const stmt = db.prepare(`
+    SELECT i.id, i.curso_id AS cursoId, c.nombre, c.descripcion, c.imagen_curso AS imagenCurso,
+           i.fecha_inscripcion AS fechaInscripcion, i.estado
+    FROM inscripciones i
+    JOIN cursos c ON i.curso_id = c.id
+    WHERE i.estudiante_id = ?
+  `);
+  return stmt.all(estudianteId);
+}
+
+module.exports = { crear, buscarPorId, buscarPorEstudianteYCurso, listarPorEstudiante };
+
+===== routes/inscripcion.routes.js =====
+const express = require('express');
+const router = express.Router();
+const inscripcionController = require('../controllers/inscripcion.controller');
+
+/**
+ * @swagger
+ * /api/inscripciones:
+ *   post:
+ *     summary: Inscribirse en un curso (HU-006)
+ *     tags: [Inscripcion]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               estudianteId:
+ *                 type: integer
+ *               cursoId:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: InscripciÃ³n creada exitosamente
+ *       400:
+ *         description: Curso no encontrado, rol invÃ¡lido o ya inscrito
+ */
+router.post('/', inscripcionController.inscribirse);
+
+/**
+ * @swagger
+ * /api/inscripciones/estudiante/{estudianteId}:
+ *   get:
+ *     summary: Listar los cursos en los que estÃ¡ inscrito un estudiante
+ *     tags: [Inscripcion]
+ *     parameters:
+ *       - in: path
+ *         name: estudianteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de inscripciones del estudiante
+ */
+router.get('/estudiante/:estudianteId', inscripcionController.listarPorEstudiante);
+
+module.exports = router;
+
+===== repository/curso.repository.js =====
+const db = require('../database/connection');
+
+function crear({ nombre, descripcion, docenteId }) {
+  const stmt = db.prepare(`
+    INSERT INTO cursos (nombre, descripcion, docente_id)
+    VALUES (?, ?, ?)
+  `);
+  const resultado = stmt.run(nombre, descripcion, docenteId);
+
+  return buscarPorId(resultado.lastInsertRowid);
+}
+
+function buscarPorId(id) {
+  const stmt = db.prepare('SELECT * FROM cursos WHERE id = ?');
+  return stmt.get(id);
+}
+
+function listarTodos(busqueda) {
+  let query = `
+    SELECT c.id, c.nombre, c.descripcion, c.docente_id AS docenteId, c.imagen_curso AS imagenCurso, u.nombre AS docenteNombre
+    FROM cursos c
+    JOIN usuarios u ON c.docente_id = u.id
+    WHERE c.activo = 1
+  `;
+  const params = [];
+
+  if (busqueda) {
+    query += ` AND (c.nombre LIKE ? OR c.descripcion LIKE ? OR u.nombre LIKE ?)`;
+    const like = `%${busqueda}%`;
+    params.push(like, like, like);
+  }
+
+  const stmt = db.prepare(query);
+  return stmt.all(...params);
+}
+
+const COLUMNAS_ACTUALIZABLES = {
+  nombre: 'nombre',
+  descripcion: 'descripcion',
+  imagenCurso: 'imagen_curso',
+};
+
+function actualizar(id, datos) {
+  const campos = [];
+  const valores = [];
+
+  for (const [campoJs, columnaDb] of Object.entries(COLUMNAS_ACTUALIZABLES)) {
+    if (datos[campoJs] !== undefined) {
+      campos.push(`${columnaDb} = ?`);
+      valores.push(datos[campoJs]);
+    }
+  }
+
+  campos.push('fecha_actualizacion = CURRENT_TIMESTAMP');
+
+  const stmt = db.prepare(`
+    UPDATE cursos
+    SET ${campos.join(', ')}
+    WHERE id = ?
+  `);
+  stmt.run(...valores, id);
+
+  return buscarPorId(id);
+}
+
+module.exports = { crear, buscarPorId, listarTodos, actualizar };
+
+===== controllers/curso.controller.js =====
+const cursoService = require('../services/curso.service');
+
+function crearCurso(req, res) {
+  try {
+    const nuevoCurso = cursoService.crearCurso(req.body);
+    res.status(201).json(nuevoCurso);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+function listarCursos(req, res) {
+  try {
+    const { busqueda } = req.query;
+    const cursos = cursoService.listarCursos(busqueda);
+    res.status(200).json(cursos);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+function actualizarCurso(req, res) {
+  try {
+    const { id } = req.params;
+    const cursoActualizado = cursoService.actualizarCurso(id, req.body);
+    res.status(200).json(cursoActualizado);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+module.exports = { crearCurso, listarCursos, actualizarCurso };
+
+===== services/curso.service.js =====
+const cursoRepository = require('../repository/curso.repository');
+
+function crearCurso(datos) {
+  const { nombre, descripcion, docenteId } = datos;
+
+  if (!nombre || !descripcion || !docenteId) {
+    throw new Error('Nombre, descripciÃ³n y docente son obligatorios');
+  }
+
+  const nuevoCurso = cursoRepository.crear({
+    nombre,
+    descripcion,
+    docenteId,
+  });
+
+  return nuevoCurso;
+}
+
+function listarCursos(busqueda) {
+  return cursoRepository.listarTodos(busqueda);
+}
+
+function actualizarCurso(id, datos) {
+  const { nombre, descripcion, imagenCurso, docenteId } = datos;
+
+  if (!nombre && !descripcion && !imagenCurso) {
+    throw new Error('Debe enviar al menos un campo para actualizar');
+  }
+
+  const curso = cursoRepository.buscarPorId(id);
+  if (!curso) {
+    throw new Error('Curso no encontrado');
+  }
+
+  if (!docenteId) {
+    throw new Error('docenteId es obligatorio para validar el curso');
+  }
+  if (curso.docente_id !== Number(docenteId)) {
+    throw new Error('No tienes permiso para editar este curso');
+  }
+
+  if (imagenCurso && !imagenCurso.startsWith('data:image')) {
+    throw new Error('La imagen del curso debe estar en formato base64 (data:image/...)');
+  }
+
+  const actualizado = cursoRepository.actualizar(id, {
+    nombre,
+    descripcion,
+    imagenCurso,
+  });
+
+  return actualizado;
+}
+
+module.exports = { crearCurso, listarCursos, actualizarCurso };
+
+===== routes/curso.routes.js =====
+const express = require('express');
+const router = express.Router();
+const cursoController = require('../controllers/curso.controller');
+
+/**
+ * @swagger
+ * /api/cursos:
+ *   post:
+ *     summary: Crear un nuevo curso
+ *     tags: [Curso]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               descripcion:
+ *                 type: string
+ *               docenteId:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Curso creado exitosamente
+ *       400:
+ *         description: Error de validaciÃ³n
+ */
+router.post('/', cursoController.crearCurso);
+
+/**
+ * @swagger
+ * /api/cursos:
+ *   get:
+ *     summary: Consultar cursos disponibles, con filtro/bÃºsqueda opcional
+ *     tags: [Curso]
+ *     parameters:
+ *       - in: query
+ *         name: busqueda
+ *         schema:
+ *           type: string
+ *         description: Filtra por nombre, descripciÃ³n o nombre del docente
+ *     responses:
+ *       200:
+ *         description: Lista de cursos
+ */
+router.get('/', cursoController.listarCursos);
+
+/**
+ * @swagger
+ * /api/cursos/{id}:
+ *   put:
+ *     summary: Editar informaciÃ³n de un curso (HU-004)
+ *     tags: [Curso]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               docenteId:
+ *                 type: integer
+ *               nombre:
+ *                 type: string
+ *               descripcion:
+ *                 type: string
+ *               imagenCurso:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Curso actualizado exitosamente
+ *       400:
+ *         description: Error de validaciÃ³n, curso no encontrado o sin permiso
+ */
+router.put('/:id', cursoController.actualizarCurso);
+
+module.exports = router;
