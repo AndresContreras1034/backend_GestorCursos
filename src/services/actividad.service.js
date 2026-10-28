@@ -47,13 +47,10 @@ function crearActividad(cursoId, datos) {
     throw new ErrorApp('fechaLimite es obligatoria y debe ser una fecha válida (ISO 8601)');
   }
   const fechaLimiteDate = new Date(fechaLimite);
-  if (fechaLimiteDate <= new Date()) {
-    throw new ErrorApp('La fecha límite debe ser posterior a la fecha actual');
-  }
 
   const puntaje = puntajeMaximo === undefined ? 5 : Number(puntajeMaximo);
-  if (!Number.isFinite(puntaje) || puntaje <= 0 || puntaje > 100) {
-    throw new ErrorApp('puntajeMaximo debe ser un número mayor a 0 y máximo 100');
+  if (!Number.isFinite(puntaje) || puntaje <= 0) {
+    throw new ErrorApp('puntajeMaximo debe ser un número mayor a 0');
   }
 
   if (permiteEntregaTardia !== undefined && typeof permiteEntregaTardia !== 'boolean') {

@@ -55,8 +55,8 @@ function actualizarActividad(cursoId, actividadId, datos = {}) {
   }
   if (datos.puntajeMaximo !== undefined) {
     const puntaje = Number(datos.puntajeMaximo);
-    if (!Number.isFinite(puntaje) || puntaje <= 0 || puntaje > 100) {
-      throw new ErrorApp('puntajeMaximo debe ser un número mayor a 0 y máximo 100');
+    if (!Number.isFinite(puntaje) || puntaje <= 0) {
+      throw new ErrorApp('puntajeMaximo debe ser un número mayor a 0');
     }
     if (puntaje !== actividad.puntajeMaximo && repo.contarCalificadas(actividad.id) > 0) {
       throw new ErrorApp('No se puede cambiar el puntaje: ya hay entregas calificadas', 409);

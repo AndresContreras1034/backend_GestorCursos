@@ -37,10 +37,9 @@ function validarPuntaje(puntajeMaximo) {
   if (
     typeof puntajeMaximo !== 'number' ||
     !Number.isFinite(puntajeMaximo) ||
-    puntajeMaximo <= 0 ||
-    puntajeMaximo > 100
+    puntajeMaximo <= 0
   ) {
-    throw new ErrorApp('puntajeMaximo debe ser un número mayor que cero y menor o igual a 100');
+    throw new ErrorApp('puntajeMaximo debe ser un número mayor que cero');
   }
 }
 

@@ -35,7 +35,7 @@ const routerAnidado = express.Router({ mergeParams: true });
  *                 format: date-time
  *               puntajeMaximo:
  *                 type: number
- *                 maximum: 100
+ *                 exclusiveMinimum: 0
  *                 default: 100
  *     responses:
  *       201:
@@ -103,8 +103,7 @@ const routerPlano = express.Router();
  *                 format: date-time
  *               puntajeMaximo:
  *                 type: number
- *                 minimum: 0
- *                 maximum: 100
+ *                 exclusiveMinimum: 0
  *     responses:
  *       200:
  *         description: Evaluación actualizada

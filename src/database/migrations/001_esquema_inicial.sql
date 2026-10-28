@@ -134,7 +134,7 @@ CREATE TABLE actividades (
     titulo TEXT NOT NULL CHECK (length(trim(titulo)) BETWEEN 3 AND 150),
     instrucciones TEXT NOT NULL CHECK (length(trim(instrucciones)) >= 5),
     fecha_limite TEXT NOT NULL CHECK (datetime(fecha_limite) IS NOT NULL),
-    puntaje_maximo REAL NOT NULL DEFAULT 5.0 CHECK (puntaje_maximo > 0 AND puntaje_maximo <= 100),
+    puntaje_maximo REAL NOT NULL DEFAULT 5.0 CHECK (puntaje_maximo > 0),
     permite_entrega_tardia INTEGER NOT NULL DEFAULT 0 CHECK (permite_entrega_tardia IN (0, 1)),
     estado TEXT NOT NULL DEFAULT 'publicada' CHECK (estado IN ('borrador', 'publicada', 'cerrada')),
     fecha_creacion TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -34,7 +34,7 @@ const router = express.Router({ mergeParams: true });
  *               titulo: { type: string }
  *               instrucciones: { type: string }
  *               fechaLimite: { type: string, example: "2026-12-20T23:59:00-05:00" }
- *               puntajeMaximo: { type: number, example: 5 }
+ *               puntajeMaximo: { type: number, exclusiveMinimum: 0, example: 5, description: Puntaje máximo de la actividad; el GPA se normaliza a escala 0-5 }
  *               estado: { type: string, enum: [borrador, publicada, cerrada] }
  *               permiteEntregaTardia: { type: boolean }
  *               permiteReemplazoEntrega: { type: boolean }

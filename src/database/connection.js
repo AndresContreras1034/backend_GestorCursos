@@ -29,11 +29,23 @@ function migrar() {
     if (aplicadas.has(archivo)) continue;
 
     const sql = fs.readFileSync(path.join(dir, archivo), 'utf8').replace(/^\uFEFF/, '');
-    const aplicar = db.transaction(() => {
-      db.exec(sql);
-      db.prepare('INSERT INTO schema_migrations (nombre) VALUES (?)').run(archivo);
-    });
-    aplicar();
+    const requiereForeignKeysDesactivadas = sql.includes('-- migrate:foreign-keys-off');
+    if (requiereForeignKeysDesactivadas) db.pragma('foreign_keys = OFF');
+    try {
+      const aplicar = db.transaction(() => {
+        db.exec(sql);
+        if (requiereForeignKeysDesactivadas) {
+          const violaciones = db.pragma('foreign_key_check');
+          if (violaciones.length > 0) {
+            throw new Error(`La migración ${archivo} deja referencias foráneas inválidas`);
+          }
+        }
+        db.prepare('INSERT INTO schema_migrations (nombre) VALUES (?)').run(archivo);
+      });
+      aplicar();
+    } finally {
+      if (requiereForeignKeysDesactivadas) db.pragma('foreign_keys = ON');
+    }
     console.log(`[DB] Migración aplicada: ${archivo}`);
   }
 }
