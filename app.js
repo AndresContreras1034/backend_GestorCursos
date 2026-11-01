@@ -30,6 +30,8 @@ const ofertaRoutes = require('./src/routes/oferta.routes');
 const evaluacionRoutes = require('./src/routes/evaluacion.routes');
 const organizacionRoutes = require('./src/routes/organizacion.routes');
 const matriculaRoutes = require('./src/routes/matricula.routes');
+const formularioRoutes = require('./src/routes/formulario.routes');
+const formularioAsignacionRoutes = require('./src/routes/formularioAsignacion.routes');
 
 const app = express();
 
@@ -70,6 +72,9 @@ app.use('/api/ofertas', ofertaRoutes.routerPlano);
 app.use('/api/cursos/:cursoId/evaluaciones', evaluacionRoutes.routerAnidado);
 app.use('/api/evaluaciones', evaluacionRoutes.routerPlano);
 app.use('/api/recursos', visorRoutes);
+app.use('/api/formularios', formularioRoutes);
+app.use('/api/cursos/:cursoId/formularios', formularioAsignacionRoutes.routerAnidado);
+app.use('/api/formulario-asignaciones', formularioAsignacionRoutes.routerPlano);
 
 app.use((err, req, res, next) => {
   if (err.type === 'entity.parse.failed') {

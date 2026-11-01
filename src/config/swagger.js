@@ -7,7 +7,7 @@ const options = {
       title: 'API Plataforma de Cursos',
       version: '1.0.0',
       description:
-        'API REST para la gestión de cursos, ofertas, sesiones, actividades, entregas, evaluación y retroalimentación, progreso y estadísticas.',
+        'API REST para gestionar cursos, formularios y evaluaciones, actividades, entregas, retroalimentación, progreso y estadísticas.',
     },
     servers: [
       {

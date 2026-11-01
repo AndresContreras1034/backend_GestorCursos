@@ -92,6 +92,31 @@ function obtenerArchivo(entregaId) {
   `).get(entregaId);
 }
 
+function sincronizarDesdeFormulario({ actividadId, estudianteId, nota, fechaEnvio, comentario }) {
+  const ahora = new Date().toISOString();
+  const existente = db.prepare(`
+    SELECT id, estado FROM entregas WHERE actividad_id = ? AND estudiante_id = ?
+  `).get(actividadId, estudianteId);
+
+  if (!existente) {
+    db.prepare(`
+      INSERT INTO entregas
+        (actividad_id, estudiante_id, comentario, fecha_entrega, es_tardia,
+         nota, fecha_calificacion, estado)
+      VALUES (?, ?, ?, ?, 0, ?, ?, 'calificada')
+    `).run(actividadId, estudianteId, comentario, fechaEnvio, nota, ahora);
+    return 'creada';
+  }
+  if (existente.estado === 'calificada') return 'omitida';
+
+  db.prepare(`
+    UPDATE entregas
+    SET nota = ?, fecha_calificacion = ?, estado = 'calificada'
+    WHERE id = ?
+  `).run(nota, ahora, existente.id);
+  return 'actualizada';
+}
+
 module.exports = {
   buscarPorId,
   buscarPorActividadYEstudiante,
@@ -100,4 +125,5 @@ module.exports = {
   calificar,
   listarEstudiantesConEntrega,
   obtenerArchivo,
+  sincronizarDesdeFormulario,
 };
