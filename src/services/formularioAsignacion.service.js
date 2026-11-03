@@ -153,9 +153,10 @@ function asignar(cursoId, datos = {}) {
     throw new ErrorApp('Los exámenes se califican en una escala de 0 a 5');
   }
   const puntajeMaximo = ESCALA_EXAMEN;
-  const duracionMinutos = datos.duracionMinutos;
-  if (!Number.isInteger(duracionMinutos) || duracionMinutos < 1 || duracionMinutos > 1440) {
-    throw new ErrorApp('duracionMinutos debe ser un número entero entre 1 y 1440');
+  const duracionMinutos = datos.duracionMinutos ?? null;
+  if (duracionMinutos !== null
+      && (!Number.isInteger(duracionMinutos) || duracionMinutos < 1 || duracionMinutos > 1440)) {
+    throw new ErrorApp('duracionMinutos debe ser null o un número entero entre 1 y 1440');
   }
   const revisionDocente = datos.revisionDocente === undefined ? true : datos.revisionDocente;
   if (typeof revisionDocente !== 'boolean') {
@@ -306,10 +307,7 @@ function evaluar(formulario, respuestas) {
   let totales = 0;
   const detalle = [];
   for (const pregunta of formulario.preguntas) {
-    const elegidas = porPregunta.get(pregunta.id);
-    if (!elegidas || elegidas.length === 0) {
-      throw new ErrorApp(`Falta responder la pregunta ${pregunta.orden}`);
-    }
+    const elegidas = porPregunta.get(pregunta.id) ?? [];
 
     const idsValidos = new Set(pregunta.opciones.map((opcion) => opcion.id));
     if (!elegidas.every((id) => idsValidos.has(id))) {
@@ -322,7 +320,7 @@ function evaluar(formulario, respuestas) {
     const correctas = pregunta.opciones
       .filter((opcion) => opcion.esCorrecta)
       .map((opcion) => opcion.id);
-    const esCorrecta = correctas.length === elegidas.length &&
+    const esCorrecta = elegidas.length > 0 && correctas.length === elegidas.length &&
       correctas.every((id) => elegidas.includes(id));
     const puntos = esCorrecta ? pregunta.puntaje : 0;
     totales += pregunta.puntaje;

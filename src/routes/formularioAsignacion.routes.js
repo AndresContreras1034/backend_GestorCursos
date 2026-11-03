@@ -18,7 +18,7 @@ const routerAnidado = express.Router({ mergeParams: true });
  *         application/json:
  *           schema:
  *             type: object
- *             required: [docenteId, formularioId, duracionMinutos]
+ *             required: [docenteId, formularioId]
  *             properties:
  *               docenteId: { type: integer }
  *               formularioId: { type: integer }
@@ -26,7 +26,7 @@ const routerAnidado = express.Router({ mergeParams: true });
  *               fechaApertura: { type: string, format: date-time }
  *               fechaCierre: { type: string, format: date-time }
  *               puntajeMaximo: { type: number, enum: [5], default: 5 }
- *               duracionMinutos: { type: integer, minimum: 1, maximum: 1440, description: El reloj inicia cuando el estudiante abre el examen por primera vez }
+ *               duracionMinutos: { type: integer, nullable: true, minimum: 1, maximum: 1440, description: Omitir o enviar null para no establecer límite de tiempo. El reloj inicia cuando el estudiante abre el examen por primera vez }
  *               revisionDocente: { type: boolean, default: true }
  *               estado: { type: string, enum: [borrador, publicada], default: publicada }
  *     responses:
