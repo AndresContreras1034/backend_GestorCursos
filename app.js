@@ -35,6 +35,8 @@ const formularioAsignacionRoutes = require('./src/routes/formularioAsignacion.ro
 
 const app = express();
 
+app.disable('x-powered-by');
+
 app.use(express.json({ limit: '25mb' }));
 
 // Documentación Swagger

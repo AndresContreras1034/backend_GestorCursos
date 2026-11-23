@@ -3,6 +3,7 @@ const db = require('../database/connection');
 const COLUMNAS = `
   fa.id, fa.formulario_id AS formularioId, fa.curso_id AS cursoId,
   fa.actividad_id AS actividadId, fa.fecha_apertura AS fechaApertura,
+  fa.corte_id AS corteId,
   fa.fecha_cierre AS fechaCierre, fa.puntaje_maximo AS puntajeMaximo,
   fa.duracion_minutos AS duracionMinutos,
   fa.revision_docente AS revisionDocente,
@@ -14,13 +15,14 @@ const FROM = 'FROM formulario_asignaciones fa JOIN formularios f ON f.id = fa.fo
 function crear(datos) {
   const resultado = db.prepare(`
     INSERT INTO formulario_asignaciones
-      (formulario_id, curso_id, actividad_id, fecha_apertura, fecha_cierre,
+      (formulario_id, curso_id, actividad_id, corte_id, fecha_apertura, fecha_cierre,
        puntaje_maximo, revision_docente, resultados_publicados, estado, duracion_minutos)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     datos.formularioId,
     datos.cursoId,
     datos.actividadId ?? null,
+    datos.corteId ?? null,
     datos.fechaApertura ?? null,
     datos.fechaCierre ?? null,
     datos.puntajeMaximo,
@@ -60,8 +62,15 @@ function listarParaEstudiante(cursoId, estudianteId) {
   `).all(estudianteId, estudianteId, cursoId);
 }
 
-function publicarResultados(id) {
-  db.prepare('UPDATE formulario_asignaciones SET resultados_publicados = 1 WHERE id = ?').run(id);
+function publicarResultados(id, actividadId = null, corteId = null) {
+  const resultado = db.prepare(`
+    UPDATE formulario_asignaciones
+    SET actividad_id = COALESCE(?, actividad_id),
+        corte_id = COALESCE(?, corte_id),
+        resultados_publicados = 1
+    WHERE id = ? AND resultados_publicados = 0
+  `).run(actividadId, corteId, id);
+  if (resultado.changes !== 1) return undefined;
   return buscarPorId(id);
 }
 

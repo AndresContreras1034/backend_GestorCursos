@@ -43,7 +43,7 @@ function crearActividad(cursoId, datos) {
     throw new ErrorApp('Las instrucciones deben tener al menos 5 caracteres');
   }
 
-  if (typeof fechaLimite !== 'string' || isNaN(new Date(fechaLimite).getTime())) {
+  if (typeof fechaLimite !== 'string' || Number.isNaN(new Date(fechaLimite).getTime())) {
     throw new ErrorApp('fechaLimite es obligatoria y debe ser una fecha válida (ISO 8601)');
   }
   const fechaLimiteDate = new Date(fechaLimite);

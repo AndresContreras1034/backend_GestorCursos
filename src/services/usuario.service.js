@@ -30,7 +30,7 @@ function actualizarPerfil(id, datos) {
 
   if (fechaNacimiento) {
     const fecha = new Date(fechaNacimiento);
-    if (isNaN(fecha.getTime())) {
+    if (Number.isNaN(fecha.getTime())) {
       throw new Error('Fecha de nacimiento inválida');
     }
     const edad = new Date().getFullYear() - fecha.getFullYear();

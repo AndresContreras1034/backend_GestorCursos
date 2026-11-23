@@ -3,6 +3,7 @@ const formularioRepo = require('../repository/formulario.repository');
 const cursoRepository = require('../repository/curso.repository');
 const actividadRepository = require('../repository/actividad.repository');
 const entregaRepository = require('../repository/entrega.repository');
+const organizacionRepository = require('../repository/organizacion.repository');
 const usuarioRepository = require('../repository/usuario.repository');
 const inscripcionRepository = require('../repository/inscripcion.repository');
 const matriculaRepository = require('../repository/matricula.repository');
@@ -73,14 +74,18 @@ function obtenerAsignacionDelDocente(id, docenteId) {
   return asignacion;
 }
 
-function verificarVentana(asignacion, ahora = Date.now()) {
+function verificarVentana(asignacion, ahora = Date.now(), permitirVencimiento = false) {
   if (asignacion.estado !== 'publicada') {
     throw new ErrorApp('El formulario no está disponible', 403);
   }
   if (asignacion.fechaApertura && new Date(asignacion.fechaApertura).getTime() > ahora) {
     throw new ErrorApp('El formulario aún no está disponible', 403);
   }
-  if (asignacion.fechaCierre && new Date(asignacion.fechaCierre).getTime() <= ahora) {
+  if (
+    !permitirVencimiento &&
+    asignacion.fechaCierre &&
+    new Date(asignacion.fechaCierre).getTime() <= ahora
+  ) {
     throw new ErrorApp('El plazo para responder este formulario ya venció', 403);
   }
 }
@@ -154,9 +159,11 @@ function asignar(cursoId, datos = {}) {
   }
   const puntajeMaximo = ESCALA_EXAMEN;
   const duracionMinutos = datos.duracionMinutos ?? null;
-  if (duracionMinutos !== null
-      && (!Number.isInteger(duracionMinutos) || duracionMinutos < 1 || duracionMinutos > 1440)) {
-    throw new ErrorApp('duracionMinutos debe ser null o un número entero entre 1 y 1440');
+  if (
+    duracionMinutos !== null &&
+    (!Number.isInteger(duracionMinutos) || duracionMinutos < 1 || duracionMinutos > 1440)
+  ) {
+    throw new ErrorApp('duracionMinutos debe ser un número entero entre 1 y 1440');
   }
   const revisionDocente = datos.revisionDocente === undefined ? true : datos.revisionDocente;
   if (typeof revisionDocente !== 'boolean') {
@@ -168,6 +175,7 @@ function asignar(cursoId, datos = {}) {
   }
 
   let actividadFinal = null;
+  let corteFinal = null;
   if (actividadId !== undefined && actividadId !== null) {
     const actividadIdNumero = Number(actividadId);
     const actividad = Number.isInteger(actividadIdNumero) && actividadIdNumero > 0
@@ -177,6 +185,20 @@ function asignar(cursoId, datos = {}) {
       throw new ErrorApp('La actividad no existe o no pertenece a este curso');
     }
     actividadFinal = actividad.id;
+    corteFinal = actividad.corteId;
+  }
+  if (datos.corteId !== undefined && datos.corteId !== null) {
+    const corteNumero = Number(datos.corteId);
+    const corte = Number.isInteger(corteNumero) && corteNumero > 0
+      ? organizacionRepository.obtenerCortes(curso.id).find((item) => item.id === corteNumero)
+      : undefined;
+    if (!corte) throw new ErrorApp('El corte seleccionado no pertenece a este curso');
+    if (corteFinal && corteFinal !== corte.id) {
+      throw new ErrorApp('El examen debe quedar en el mismo corte que su actividad vinculada');
+    }
+    corteFinal = corte.id;
+  } else if (!actividadFinal) {
+    throw new ErrorApp('corteId es obligatorio para asignar el examen al GPA');
   }
 
   return repo.transaccion(() => {
@@ -187,6 +209,7 @@ function asignar(cursoId, datos = {}) {
       formularioId: formulario.id,
       cursoId: curso.id,
       actividadId: actividadFinal,
+      corteId: corteFinal,
       fechaApertura,
       fechaCierre,
       puntajeMaximo,
@@ -278,7 +301,7 @@ function obtenerParaResponder(asignacionId, estudianteId) {
   };
 }
 
-function evaluar(formulario, respuestas) {
+function evaluar(formulario, respuestas, permitirIncompletas = false) {
   if (!Array.isArray(respuestas)) throw new ErrorApp('respuestas debe ser una lista');
 
   const porPregunta = new Map();
@@ -307,7 +330,12 @@ function evaluar(formulario, respuestas) {
   let totales = 0;
   const detalle = [];
   for (const pregunta of formulario.preguntas) {
-    const elegidas = porPregunta.get(pregunta.id) ?? [];
+    const elegidas = porPregunta.get(pregunta.id);
+    totales += pregunta.puntaje;
+    if (!elegidas || elegidas.length === 0) {
+      if (permitirIncompletas) continue;
+      throw new ErrorApp(`Falta responder la pregunta ${pregunta.orden}`);
+    }
 
     const idsValidos = new Set(pregunta.opciones.map((opcion) => opcion.id));
     if (!elegidas.every((id) => idsValidos.has(id))) {
@@ -320,10 +348,9 @@ function evaluar(formulario, respuestas) {
     const correctas = pregunta.opciones
       .filter((opcion) => opcion.esCorrecta)
       .map((opcion) => opcion.id);
-    const esCorrecta = elegidas.length > 0 && correctas.length === elegidas.length &&
+    const esCorrecta = correctas.length === elegidas.length &&
       correctas.every((id) => elegidas.includes(id));
     const puntos = esCorrecta ? pregunta.puntaje : 0;
-    totales += pregunta.puntaje;
     obtenidos += puntos;
     detalle.push({
       preguntaId: pregunta.id,
@@ -338,22 +365,26 @@ function evaluar(formulario, respuestas) {
 function enviar(asignacionId, datos = {}) {
   const asignacion = obtenerAsignacion(asignacionId);
   const estudiante = validarEstudianteInscrito(asignacion.cursoId, datos.estudianteId);
-  verificarVentana(asignacion);
   if (repo.buscarEnvio(asignacion.id, estudiante.id)) {
     throw new ErrorApp('Ya enviaste este formulario', 409);
   }
+  let tiempoAgotado = false;
   if (asignacion.duracionMinutos) {
     const intento = repo.buscarIntento(asignacion.id, estudiante.id);
     if (!intento) {
       throw new ErrorApp('Debes abrir el examen antes de enviar tus respuestas', 409);
     }
-    if (calcularExpiracion(asignacion, intento.fechaInicio).segundosRestantes === 0) {
-      throw new ErrorApp('El tiempo para responder este examen ya venció', 409);
-    }
+    tiempoAgotado =
+      calcularExpiracion(asignacion, intento.fechaInicio).segundosRestantes === 0;
   }
+  verificarVentana(asignacion, Date.now(), tiempoAgotado);
 
   const formulario = formularioRepo.obtenerCompleto(asignacion.formularioId);
-  const { obtenidos, totales, detalle } = evaluar(formulario, datos.respuestas);
+  const { obtenidos, totales, detalle } = evaluar(
+    formulario,
+    datos.respuestas,
+    tiempoAgotado
+  );
   const nota = redondear((obtenidos / totales) * asignacion.puntajeMaximo);
 
   let envioId;
@@ -488,19 +519,36 @@ function consultarEnvioDocente(asignacionId, envioId, docenteId) {
   return detalleEnvio(formularioRepo.obtenerCompleto(asignacion.formularioId), envio);
 }
 
-function publicarResultados(asignacionId, docenteId) {
+function publicarResultados(asignacionId, docenteId, corteId) {
   const asignacion = obtenerAsignacionDelDocente(asignacionId, docenteId);
   if (asignacion.resultadosPublicados === 1) {
     throw new ErrorApp('Los resultados ya están publicados', 409);
   }
   return repo.transaccion(() => {
-    const publicada = repo.publicarResultados(asignacion.id);
-    const gpa = asignacion.actividadId ? { creada: 0, actualizada: 0, omitida: 0 } : null;
-    if (gpa) {
+    let actividadId = asignacion.actividadId;
+    let corteFinal = asignacion.corteId;
+    if (!actividadId) {
+      const idCorte = Number(corteFinal ?? corteId);
+      if (!Number.isInteger(idCorte) || idCorte <= 0) {
+        throw new ErrorApp('Debes seleccionar el corte donde contará el examen para el GPA');
+      }
+      const corte = organizacionRepository.obtenerCortes(asignacion.cursoId)
+        .find((item) => item.id === idCorte);
+      if (!corte) throw new ErrorApp('El corte seleccionado no pertenece a este curso');
+      corteFinal = corte.id;
+    }
+
+    const publicada = repo.publicarResultados(asignacion.id, actividadId, corteFinal);
+    if (!publicada) throw new ErrorApp('Los resultados ya están publicados', 409);
+    const gpa = { creada: 0, actualizada: 0, omitida: 0 };
+    if (actividadId) {
+      const asignacionConActividad = { ...asignacion, actividadId };
       for (const envio of repo.listarEnvios(asignacion.id)) {
-        const resultado = sincronizarConGpa(asignacion, envio);
+        const resultado = sincronizarConGpa(asignacionConActividad, envio);
         if (resultado) gpa[resultado] += 1;
       }
+    } else {
+      gpa.creada = repo.listarEnvios(asignacion.id).length;
     }
     return { ...serializar(publicada), gpa };
   });

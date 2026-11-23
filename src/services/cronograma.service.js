@@ -16,10 +16,10 @@ function validarPertenencia(cursoId, docenteId) {
 }
 
 function validarFechas(fechaInicio, fechaFin) {
-  if (fechaInicio && isNaN(new Date(fechaInicio).getTime())) {
+  if (fechaInicio && Number.isNaN(new Date(fechaInicio).getTime())) {
     throw new Error('fechaInicio inválida');
   }
-  if (fechaFin && isNaN(new Date(fechaFin).getTime())) {
+  if (fechaFin && Number.isNaN(new Date(fechaFin).getTime())) {
     throw new Error('fechaFin inválida');
   }
   if (fechaInicio && fechaFin && new Date(fechaInicio) > new Date(fechaFin)) {

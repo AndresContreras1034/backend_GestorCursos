@@ -15,5 +15,5 @@ module.exports = {
   envio: manejar(200, (req) =>
     service.consultarEnvioDocente(req.params.id, req.params.envioId, req.query.docenteId)),
   publicar: manejar(200, (req) =>
-    service.publicarResultados(req.params.id, req.body?.docenteId)),
+    service.publicarResultados(req.params.id, req.body?.docenteId, req.body?.corteId)),
 };

@@ -26,7 +26,7 @@ function validarPertenencia(cursoId, docenteId) {
 
 function validarFecha(campo, valor) {
   if (valor !== null && valor !== undefined && valor !== '' &&
-      (typeof valor !== 'string' || isNaN(new Date(valor).getTime()))) {
+      (typeof valor !== 'string' || Number.isNaN(new Date(valor).getTime()))) {
     throw new ErrorApp(`${campo} inválida`);
   }
 }

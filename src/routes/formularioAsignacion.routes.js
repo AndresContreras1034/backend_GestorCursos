@@ -23,10 +23,11 @@ const routerAnidado = express.Router({ mergeParams: true });
  *               docenteId: { type: integer }
  *               formularioId: { type: integer }
  *               actividadId: { type: integer }
+ *               corteId: { type: integer, description: Corte al que se asignará la nota del examen para el GPA; obligatorio si no se vincula una actividad existente }
  *               fechaApertura: { type: string, format: date-time }
  *               fechaCierre: { type: string, format: date-time }
  *               puntajeMaximo: { type: number, enum: [5], default: 5 }
- *               duracionMinutos: { type: integer, nullable: true, minimum: 1, maximum: 1440, description: Omitir o enviar null para no establecer límite de tiempo. El reloj inicia cuando el estudiante abre el examen por primera vez }
+ *               duracionMinutos: { type: integer, nullable: true, minimum: 1, maximum: 1440, description: Omitir o enviar null para no establecer límite. El reloj inicia cuando el estudiante abre el examen por primera vez }
  *               revisionDocente: { type: boolean, default: true }
  *               estado: { type: string, enum: [borrador, publicada], default: publicada }
  *     responses:
@@ -155,6 +156,7 @@ routerPlano.get('/:id/resultados/:envioId', controller.envio);
  *       - { in: path, name: id, required: true, schema: { type: integer } }
  *     requestBody:
  *       required: true
+ *       description: corteId es obligatorio si el examen todavía no está vinculado a una actividad del GPA.
  *       content:
  *         application/json:
  *           schema:
@@ -162,6 +164,7 @@ routerPlano.get('/:id/resultados/:envioId', controller.envio);
  *             required: [docenteId]
  *             properties:
  *               docenteId: { type: integer }
+ *               corteId: { type: integer, description: Corte donde el examen contará como actividad independiente del GPA }
  *     responses:
  *       200: { description: Resultados publicados }
  *       409: { description: Ya estaban publicados }

@@ -4,7 +4,7 @@ const ZONA = '-05:00';
 function esFechaISO(valor) {
   if (typeof valor !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
   const fecha = new Date(`${valor}T00:00:00Z`);
-  return !isNaN(fecha.getTime()) && fecha.toISOString().slice(0, 10) === valor;
+  return !Number.isNaN(fecha.getTime()) && fecha.toISOString().slice(0, 10) === valor;
 }
 
 // Un corte cubre desde las 00:00 de fechaInicio hasta las 23:59:59 de fechaFin (hora Colombia)

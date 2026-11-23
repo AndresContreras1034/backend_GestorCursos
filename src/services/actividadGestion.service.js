@@ -48,7 +48,7 @@ function actualizarActividad(cursoId, actividadId, datos = {}) {
     campos.instrucciones = datos.instrucciones.trim();
   }
   if (datos.fechaLimite !== undefined) {
-    if (typeof datos.fechaLimite !== 'string' || isNaN(new Date(datos.fechaLimite).getTime())) {
+    if (typeof datos.fechaLimite !== 'string' || Number.isNaN(new Date(datos.fechaLimite).getTime())) {
       throw new ErrorApp('fechaLimite debe ser una fecha válida (ISO 8601)');
     }
     campos.fechaLimite = new Date(datos.fechaLimite).toISOString();

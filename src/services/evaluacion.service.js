@@ -27,7 +27,7 @@ function validarFecha(fechaLimite) {
     fechaLimite !== null &&
     fechaLimite !== undefined &&
     fechaLimite !== '' &&
-    (typeof fechaLimite !== 'string' || isNaN(new Date(fechaLimite).getTime()))
+    (typeof fechaLimite !== 'string' || Number.isNaN(new Date(fechaLimite).getTime()))
   ) {
     throw new ErrorApp('fechaLimite inválida');
   }

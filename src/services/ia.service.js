@@ -79,9 +79,13 @@ async function generarFormulario(promptDocente) {
 
   let contenido;
   try {
-    const texto = String(eleccion?.message?.content ?? '')
-      .replace(/^```(?:json)?\s*|\s*```$/g, '')
-      .trim();
+    let texto = String(eleccion?.message?.content ?? '').trim();
+    if (texto.startsWith('```')) {
+      texto = texto.slice(3);
+      if (texto.startsWith('json')) texto = texto.slice(4);
+      texto = texto.trimStart();
+    }
+    if (texto.endsWith('```')) texto = texto.slice(0, -3).trimEnd();
     contenido = JSON.parse(texto);
   } catch {
     throw new ErrorApp('La IA no devolvió un JSON válido. Intenta de nuevo', 502);

@@ -8,8 +8,19 @@ const PARENTESCOS = ['padre', 'madre', 'acudiente', 'hermano', 'abuelo', 'tio', 
 
 const MAX_INTENTOS = 5;
 const MINUTOS_BLOQUEO = 15;
-const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REGEX_TELEFONO = /^\+?\d{7,15}$/;
+
+function esEmailValido(email) {
+  const arroba = email.indexOf('@');
+  const punto = email.lastIndexOf('.');
+  return (
+    arroba > 0 &&
+    arroba === email.lastIndexOf('@') &&
+    punto > arroba + 1 &&
+    punto < email.length - 1 &&
+    !/\s/.test(email)
+  );
+}
 
 function validarTexto(valor, campo, min, max) {
   if (typeof valor !== 'string') throw new Error(`${campo} es obligatorio`);
@@ -34,7 +45,7 @@ function calcularEdad(fechaNacimiento) {
     throw new Error('fechaNacimiento debe tener formato YYYY-MM-DD');
   }
   const nacimiento = new Date(`${fechaNacimiento}T00:00:00Z`);
-  if (isNaN(nacimiento.getTime()) || nacimiento.toISOString().slice(0, 10) !== fechaNacimiento) {
+  if (Number.isNaN(nacimiento.getTime()) || nacimiento.toISOString().slice(0, 10) !== fechaNacimiento) {
     throw new Error('fechaNacimiento no es una fecha válida');
   }
 
@@ -62,7 +73,7 @@ function validarFamiliar(familiar) {
   let email = null;
   if (familiar.email) {
     email = familiar.email.trim().toLowerCase();
-    if (!REGEX_EMAIL.test(email)) throw new Error('El correo del familiar es inválido');
+    if (!esEmailValido(email)) throw new Error('El correo del familiar es inválido');
   }
   return { nombreCompleto, parentesco: familiar.parentesco, telefono: familiar.telefono, email };
 }
@@ -77,7 +88,7 @@ async function registrar(datos) {
   const apellidoFinal = validarTexto(apellido, 'El apellido', 2, 80);
 
   const emailFinal = typeof email === 'string' ? email.trim().toLowerCase() : '';
-  if (!REGEX_EMAIL.test(emailFinal) || emailFinal.length > 254) {
+  if (emailFinal.length > 254 || !esEmailValido(emailFinal)) {
     throw new Error('El correo no tiene un formato válido');
   }
 
