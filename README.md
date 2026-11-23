@@ -61,4 +61,3 @@ jmeter -n -t availability-test.jmx -Jthreads=100 -Jramp=60 -l resultados.jtl
 ```
 
 Este plan mide respuestas de dos rutas en una instancia local; no demuestra autenticación exitosa, alta disponibilidad ni recuperación ante fallos. El script `npm test` todavía es un marcador de posición y no ejecuta una suite automatizada.
-
