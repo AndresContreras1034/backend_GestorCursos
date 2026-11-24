@@ -1,0 +1,314 @@
+PRUEBA POSTMAN - SOLO METODO POST
+================================
+
+Servidor: http://127.0.0.1:3000
+
+Antes de comenzar:
+1. Ejecuta la base reiniciada con pruebas-curl-progresivas.bat.
+   Esto deja el servidor activo y crea IDs desde 1.
+2. En Postman selecciona metodo POST.
+3. En Headers agrega:
+   Content-Type = application/json
+4. En Body selecciona raw y JSON.
+5. Ejecuta las solicitudes en el mismo orden mostrado.
+
+IMPORTANTE:
+- Pegue solamente la URL, sin saltos de linea ni texto adicional.
+- La URL correcta termina exactamente en "/api/auth/register".
+- Si obtiene Cannot POST /api/auth/register%0A, elimine el salto de linea
+  al final del campo URL y vuelva a enviar.
+
+
+PASO 1 - Registrar docente
+--------------------------
+URL:
+http://127.0.0.1:3000/api/auth/register
+
+JSON:
+{
+  "nombre": "Prueba",
+  "apellido": "Docente",
+  "email": "docente.postman@example.test",
+  "password": "Prueba123",
+  "rol": "docente",
+  "fechaNacimiento": "1988-05-20",
+  "genero": "prefiero_no_decir"
+}
+
+Respuesta esperada:
+HTTP 201
+
+Guarda en una variable:
+id del usuario = docenteId
+
+Ejemplo de respuesta:
+{"id":1,"nombre":"Prueba","rol":"docente"}
+
+
+PASO 2 - Registrar estudiante
+-----------------------------
+URL:
+http://127.0.0.1:3000/api/auth/register
+
+JSON:
+{
+  "nombre": "Prueba",
+  "apellido": "Estudiante",
+  "email": "estudiante.postman@example.test",
+  "password": "Prueba123",
+  "rol": "estudiante",
+  "fechaNacimiento": "2002-05-20",
+  "genero": "prefiero_no_decir"
+}
+
+Respuesta esperada:
+HTTP 201
+
+Guarda:
+id del usuario = estudianteId
+
+
+PASO 3 - Iniciar sesion del docente
+-----------------------------------
+URL:
+http://127.0.0.1:3000/api/auth/login
+
+JSON:
+{
+  "email": "docente.postman@example.test",
+  "password": "Prueba123"
+}
+
+Respuesta esperada:
+HTTP 200
+
+El login confirma las credenciales. No es necesaria autenticacion
+por token en el backend actual.
+
+
+PASO 4 - Crear curso
+--------------------
+URL:
+http://127.0.0.1:3000/api/cursos
+
+JSON:
+{
+  "nombre": "Curso Postman",
+  "descripcion": "Curso creado desde la sustentacion en Postman.",
+  "docenteId": 1,
+  "modalidad": "virtual",
+  "semestre": "2027-1",
+  "codigo": "PM-101",
+  "estado": "abierto",
+  "notaMinima": 3,
+  "cupoMaximo": 30,
+  "enlaceVirtual": "https://meet.google.com/prueba",
+  "cortes": [
+    {
+      "numero": 1,
+      "fechaInicio": "2027-08-03",
+      "fechaFin": "2027-09-18",
+      "porcentaje": 30
+    },
+    {
+      "numero": 2,
+      "fechaInicio": "2027-09-21",
+      "fechaFin": "2027-10-30",
+      "porcentaje": 30
+    },
+    {
+      "numero": 3,
+      "fechaInicio": "2027-11-02",
+      "fechaFin": "2027-11-20",
+      "porcentaje": 40
+    }
+  ],
+  "horarios": [],
+  "tematicas": []
+}
+
+Importante:
+- Reemplaza docenteId por el id obtenido en el paso 1.
+- Los porcentajes de los 3 cortes deben sumar 100.
+- Las fechas no pueden traslaparse.
+
+Respuesta esperada:
+HTTP 201
+
+Guarda:
+id del curso = cursoId
+
+
+PASO 5 - Inscribir estudiante
+-----------------------------
+URL:
+http://127.0.0.1:3000/api/inscripciones
+
+JSON:
+{
+  "estudianteId": 2,
+  "cursoId": 1
+}
+
+Importante:
+- Reemplaza estudianteId por el id obtenido en el paso 2.
+- Reemplaza cursoId por el id obtenido en el paso 4.
+
+Respuesta esperada:
+HTTP 201
+
+Guarda:
+id de la inscripcion = inscripcionId
+
+
+PASO 6 - Crear una sesion
+-------------------------
+URL:
+http://127.0.0.1:3000/api/cursos/1/sesiones
+
+JSON:
+{
+  "docenteId": 1,
+  "titulo": "Sesion introductoria",
+  "descripcion": "Primera sesion creada desde Postman.",
+  "fechaInicio": "2027-12-01T08:00:00-05:00",
+  "fechaFin": "2027-12-01T10:00:00-05:00",
+  "orden": 1
+}
+
+Importante:
+- Reemplaza 1 de la URL por cursoId.
+- Reemplaza docenteId por el id del docente.
+
+Respuesta esperada:
+HTTP 201
+
+Guarda:
+id de la sesion = sesionId
+
+
+PASO 7 - Crear una actividad
+----------------------------
+URL:
+http://127.0.0.1:3000/api/cursos/1/actividades
+
+JSON:
+{
+  "docenteId": 1,
+  "corteId": 1,
+  "titulo": "Actividad Postman",
+  "instrucciones": "Entrega un archivo PDF para probar el backend.",
+  "fechaLimite": "2027-09-17T23:59:00-05:00",
+  "puntajeMaximo": 5,
+  "permiteEntregaTardia": false,
+  "permiteReemplazoEntrega": true,
+  "estado": "publicada"
+}
+
+Importante:
+- Reemplaza 1 de la URL por cursoId.
+- Reemplaza docenteId por el id del docente.
+- corteId debe existir dentro del curso creado.
+- La fecha limite debe estar dentro del corte 1.
+
+Respuesta esperada:
+HTTP 201
+
+Guarda:
+id de la actividad = actividadId
+
+
+PASO 8 - Publicar un recurso
+----------------------------
+URL:
+http://127.0.0.1:3000/api/recursos
+
+JSON:
+{
+  "cursoId": 1,
+  "docenteId": 1,
+  "nombre": "Material Postman",
+  "descripcion": "Material de prueba publicado desde Postman.",
+  "enlace": "https://example.com/material.pdf"
+}
+
+Respuesta esperada:
+HTTP 201
+
+
+PASO 9 - Entregar la actividad como estudiante
+----------------------------------------------
+URL:
+http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas
+
+JSON:
+{
+  "estudianteId": 2,
+  "comentario": "Entrega realizada desde Postman.",
+  "archivo": "data:application/pdf;base64,JVBERi0xLjMKQ1JVTCBURVNUIEZJQ0hF",
+  "archivoNombre": "entrega-postman.pdf",
+  "archivoTipo": "application/pdf"
+}
+
+Importante:
+- Reemplaza cursoId en la URL.
+- Reemplaza actividadId en la URL.
+- Reemplaza estudianteId por el id del estudiante.
+- La actividad debe estar dentro de su plazo.
+
+Respuesta esperada:
+HTTP 201
+
+Guarda:
+id de la entrega = entregaId
+
+
+PASO 10 - Calificar la entrega
+------------------------------
+URL:
+http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion
+
+JSON:
+{
+  "docenteId": 1,
+  "nota": 4.5,
+  "retroalimentacion": "Buen trabajo. Retroalimentacion realizada desde Postman."
+}
+
+Importante:
+- Reemplaza cursoId, actividadId y entregaId por los IDs obtenidos.
+- Reemplaza docenteId por el id del docente.
+
+Respuesta esperada:
+HTTP 200
+
+
+USO DE VARIABLES EN POSTMAN
+===========================
+Puedes definir estas variables manualmente en Variables:
+
+baseUrl = http://127.0.0.1:3000
+docenteId = id obtenido en el paso 1
+estudianteId = id obtenido en el paso 2
+cursoId = id obtenido en el paso 4
+actividadId = id obtenido en el paso 7
+entregaId = id obtenido en el paso 9
+
+Luego podrás usar URLs como:
+
+{{baseUrl}}/api/cursos/{{cursoId}}/actividades
+{{baseUrl}}/api/cursos/{{cursoId}}/actividades/{{actividadId}}/entregas
+
+
+COMPROBACION RAPIDA
+===================
+Despues de estos POST ejecutados:
+- El docente quedara registrado.
+- El estudiante quedara registrado.
+- El curso quedara creado.
+- La inscripcion quedara creada.
+- La sesion quedara creada.
+- La actividad quedara creada.
+- El recurso quedara publicado.
+- La entrega quedara registrada.
+- La entrega quedara calificada.
