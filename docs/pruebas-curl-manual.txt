@@ -1,0 +1,254 @@
+PRUEBAS CURL MANUALES - API PLATAFORMA DE CURSOS
+================================================
+
+Estos son comandos individuales para ejecutar tú mismo en PowerShell.
+NO es un script: copia y ejecuta cada comando manualmente, uno por uno.
+No pegues el contenido completo del archivo en Invoke-Expression.
+
+1. En una terminal, inicia la API desde la raíz de este proyecto:
+
+   npm start
+
+2. En otra terminal de PowerShell, usa la URL:
+
+   http://localhost:3000
+
+3. En los comandos siguientes, reemplaza cada marcador antes de ejecutar:
+
+   <DOCENTE_ID>       ID devuelto al registrar al docente.
+   <ESTUDIANTE_ID>    ID devuelto al registrar al estudiante.
+   <CURSO_ID>         ID devuelto al crear el curso.
+   <SESION_ID>        ID devuelto al crear la sesión.
+   <OFERTA_ID>        ID devuelto al crear la oferta.
+   <INSCRIPCION_ID>   ID devuelto al inscribir al estudiante.
+   <RECURSO_ID>       ID devuelto al crear el recurso.
+   <ACTIVIDAD_ID>     ID devuelto al crear la actividad.
+   <ENTREGA_ID>       ID devuelto al entregar la actividad.
+   <EVALUACION_ID>    ID devuelto al crear la evaluación.
+
+Usa IDs numéricos sin los signos <>. Las contraseñas y correos son ficticios;
+usa un correo diferente si ya registraste el mismo anteriormente.
+PowerShell acepta JSON entre comillas simples con --data-raw.
+
+IMPORTANTE:
+- Estos comandos crean y modifican datos en la base de datos configurada
+  por el servidor. Para pruebas, usa una copia o base de datos de desarrollo.
+- Ejecuta las operaciones DELETE solamente al final: desactivan registros.
+- Para consultar respuestas y códigos HTTP se usa curl.exe -i.
+
+
+A. REGISTRO E INICIO DE SESIÓN
+------------------------------
+
+Registrar un docente:
+
+curl.exe -i -X POST "http://localhost:3000/api/auth/register" -H "Content-Type: application/json" --data-raw '{"nombre":"Docente Curl","apellido":"Prueba","email":"docente-manual@example.test","password":"Prueba123","rol":"docente","fechaNacimiento":"1990-05-20","genero":"otro"}'
+
+Registrar un estudiante:
+
+curl.exe -i -X POST "http://localhost:3000/api/auth/register" -H "Content-Type: application/json" --data-raw '{"nombre":"Estudiante Curl","apellido":"Prueba","email":"estudiante-manual@example.test","password":"Prueba123","rol":"estudiante","fechaNacimiento":"2000-05-20","genero":"otro"}'
+
+Iniciar sesión como docente:
+
+curl.exe -i -X POST "http://localhost:3000/api/auth/login" -H "Content-Type: application/json" --data-raw '{"email":"docente-manual@example.test","password":"Prueba123"}'
+
+Iniciar sesión como estudiante:
+
+curl.exe -i -X POST "http://localhost:3000/api/auth/login" -H "Content-Type: application/json" --data-raw '{"email":"estudiante-manual@example.test","password":"Prueba123"}'
+
+Consultar perfil:
+
+curl.exe -i "http://localhost:3000/api/usuarios/<ESTUDIANTE_ID>"
+
+Actualizar perfil:
+
+curl.exe -i -X PUT "http://localhost:3000/api/usuarios/<ESTUDIANTE_ID>" -H "Content-Type: application/json" --data-raw '{"nombre":"Estudiante Curl Actualizado"}'
+
+
+B. CURSOS
+---------
+
+Crear curso:
+
+curl.exe -i -X POST "http://localhost:3000/api/cursos" -H "Content-Type: application/json" --data-raw '{"nombre":"Curso de prueba manual","descripcion":"Curso para probar la API REST","docenteId":<DOCENTE_ID>}'
+
+Listar cursos:
+
+curl.exe -i "http://localhost:3000/api/cursos"
+
+Buscar cursos por texto:
+
+curl.exe -i "http://localhost:3000/api/cursos?busqueda=prueba"
+
+Consultar detalle del curso:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>"
+
+Actualizar curso:
+
+curl.exe -i -X PUT "http://localhost:3000/api/cursos/<CURSO_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"nombre":"Curso manual actualizado","descripcion":"Descripción actualizada"}'
+
+
+C. UNIDADES TEMÁTICAS / SESIONES
+--------------------------------
+
+Crear una unidad temática (sesión del cronograma):
+
+curl.exe -i -X POST "http://localhost:3000/api/cursos/<CURSO_ID>/sesiones" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"titulo":"Unidad 1: Introducción","descripcion":"Fundamentos del curso","fechaInicio":"2026-11-01T09:00:00.000Z","fechaFin":"2026-11-01T10:00:00.000Z","orden":1}'
+
+Listar sesiones/unidades del curso:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/sesiones"
+
+Actualizar sesión:
+
+curl.exe -i -X PUT "http://localhost:3000/api/sesiones/<SESION_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"titulo":"Unidad 1 actualizada","orden":1}'
+
+
+D. OFERTA EDUCATIVA Y CUPO DE INSCRIPCIÓN
+-----------------------------------------
+
+Crear oferta virtual. La apertura debe estar vigente para poder inscribirse:
+
+curl.exe -i -X POST "http://localhost:3000/api/cursos/<CURSO_ID>/ofertas" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"cupos":2,"fechaApertura":"2020-01-01T00:00:00.000Z","fechaCierre":"2099-12-31T23:59:59.000Z","modalidad":"virtual"}'
+
+Listar ofertas activas del curso:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/ofertas"
+
+Actualizar cupos, fechas o modalidad:
+
+curl.exe -i -X PUT "http://localhost:3000/api/ofertas/<OFERTA_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"cupos":3,"modalidad":"hibrida"}'
+
+Inscribir estudiante en una oferta (al usar una oferta, envía ofertaId):
+
+curl.exe -i -X POST "http://localhost:3000/api/inscripciones" -H "Content-Type: application/json" --data-raw '{"estudianteId":<ESTUDIANTE_ID>,"ofertaId":<OFERTA_ID>}'
+
+Listar inscripciones activas del estudiante:
+
+curl.exe -i "http://localhost:3000/api/inscripciones/estudiante/<ESTUDIANTE_ID>"
+
+Retirar una inscripción activa:
+
+curl.exe -i -X PATCH "http://localhost:3000/api/inscripciones/<INSCRIPCION_ID>/retirar" -H "Content-Type: application/json" --data-raw '{"estudianteId":<ESTUDIANTE_ID>}'
+
+Si vuelves a inscribir al estudiante después de retirarlo, se reactiva la
+inscripción. Para probar el límite de cupos, crea una oferta con cupos:1 e
+intenta inscribir a dos estudiantes distintos.
+
+
+E. RECURSOS DEL CURSO
+---------------------
+
+Publicar un recurso mediante enlace:
+
+curl.exe -i -X POST "http://localhost:3000/api/recursos" -H "Content-Type: application/json" --data-raw '{"cursoId":<CURSO_ID>,"docenteId":<DOCENTE_ID>,"nombre":"Lectura de la unidad 1","descripcion":"Material complementario","enlace":"https://example.com/material"}'
+
+Listar recursos del curso (el estudiante debe estar inscrito):
+
+curl.exe -i "http://localhost:3000/api/recursos/curso/<CURSO_ID>?estudianteId=<ESTUDIANTE_ID>"
+
+Actualizar recurso:
+
+curl.exe -i -X PUT "http://localhost:3000/api/recursos/<RECURSO_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"nombre":"Lectura actualizada","enlace":"https://example.com/material-actualizado"}'
+
+
+F. ACTIVIDADES, ENTREGAS, EVALUACIÓN Y RETROALIMENTACIÓN
+--------------------------------------------------------
+
+Crear actividad. La fecha límite debe estar en el futuro:
+
+curl.exe -i -X POST "http://localhost:3000/api/cursos/<CURSO_ID>/actividades" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"titulo":"Actividad práctica 1","instrucciones":"Resolver y entregar el ejercicio práctico del curso.","fechaLimite":"2099-12-15T23:59:00.000Z","puntajeMaximo":5,"permiteEntregaTardia":false,"permiteReemplazoEntrega":false,"cronogramaId":<SESION_ID>,"estado":"publicada"}'
+
+Listar actividades para el estudiante inscrito:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/actividades?usuarioId=<ESTUDIANTE_ID>"
+
+Listar actividades para el docente dueño:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/actividades?usuarioId=<DOCENTE_ID>"
+
+Entregar un PDF ficticio de prueba. El contenido base64 incluido representa
+un PDF mínimo:
+
+curl.exe -i -X POST "http://localhost:3000/api/cursos/<CURSO_ID>/actividades/<ACTIVIDAD_ID>/entregas" -H "Content-Type: application/json" --data-raw '{"estudianteId":<ESTUDIANTE_ID>,"archivo":"data:application/pdf;base64,JVBERi0xLjQKJUVPRgo=","archivoNombre":"entrega-manual.pdf","comentario":"Entrega de prueba manual"}'
+
+Consultar entregas y estudiantes pendientes (docente dueño):
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/actividades/<ACTIVIDAD_ID>/entregas?docenteId=<DOCENTE_ID>"
+
+Calificar y dejar retroalimentación:
+
+curl.exe -i -X PUT "http://localhost:3000/api/cursos/<CURSO_ID>/actividades/<ACTIVIDAD_ID>/entregas/<ENTREGA_ID>/calificacion" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"nota":4.5,"retroalimentacion":"Buen trabajo. La solución está clara; revisa el último paso."}'
+
+Consultar las calificaciones del estudiante en el curso:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/calificaciones?estudianteId=<ESTUDIANTE_ID>"
+
+Consultar el resumen/GPA del estudiante:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/calificaciones/resumen?estudianteId=<ESTUDIANTE_ID>"
+
+Consultar el progreso del estudiante:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/progreso?estudianteId=<ESTUDIANTE_ID>"
+
+Consultar estadísticas del curso (docente dueño):
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/estadisticas?docenteId=<DOCENTE_ID>"
+
+Actualizar actividad:
+
+curl.exe -i -X PUT "http://localhost:3000/api/cursos/<CURSO_ID>/actividades/<ACTIVIDAD_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"titulo":"Actividad práctica actualizada","instrucciones":"Resolver los ejercicios y explicar el procedimiento utilizado."}'
+
+
+G. EVALUACIÓN DEL CURSO (RECURSO INDEPENDIENTE)
+------------------------------------------------
+
+Crear evaluación:
+
+curl.exe -i -X POST "http://localhost:3000/api/cursos/<CURSO_ID>/evaluaciones" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"titulo":"Evaluación final","descripcion":"Evaluación general del curso","fechaLimite":"2099-12-20T23:59:00.000Z","puntajeMaximo":100}'
+
+Listar evaluaciones del curso:
+
+curl.exe -i "http://localhost:3000/api/cursos/<CURSO_ID>/evaluaciones"
+
+Actualizar evaluación:
+
+curl.exe -i -X PUT "http://localhost:3000/api/evaluaciones/<EVALUACION_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>,"puntajeMaximo":90,"descripcion":"Evaluación final actualizada"}'
+
+
+H. BAJAS LÓGICAS (EJECUTAR AL FINAL)
+------------------------------------
+
+Desactivar una sesión:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/sesiones/<SESION_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>}'
+
+Desactivar un recurso:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/recursos/<RECURSO_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>}'
+
+Desactivar una actividad:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/cursos/<CURSO_ID>/actividades/<ACTIVIDAD_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>}'
+
+Desactivar evaluación:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/evaluaciones/<EVALUACION_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>}'
+
+Desactivar oferta:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/ofertas/<OFERTA_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>}'
+
+Desactivar un curso:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/cursos/<CURSO_ID>" -H "Content-Type: application/json" --data-raw '{"docenteId":<DOCENTE_ID>}'
+
+Desactivar el usuario de prueba:
+
+curl.exe -i -X DELETE "http://localhost:3000/api/usuarios/<ESTUDIANTE_ID>"
+
+El inicio de sesión de un usuario desactivado debe responder HTTP 401:
+
+curl.exe -i -X POST "http://localhost:3000/api/auth/login" -H "Content-Type: application/json" --data-raw '{"email":"estudiante-manual@example.test","password":"Prueba123"}'

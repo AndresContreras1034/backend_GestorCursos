@@ -1,0 +1,138 @@
+# Pruebas cURL progresivas
+Fecha: 2026-11-23 19:08:15
+Base reiniciada: C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\database.sqlite
+
+## [1] Registrar docente
+Endpoint: POST /api/auth/register
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\01-Registrar-docente.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [2] Registrar estudiante
+Endpoint: POST /api/auth/register
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/register" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\02-Registrar-estudiante.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [3] Login del docente
+Endpoint: POST /api/auth/login
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/auth/login" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\03-Login-del-docente.json"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [4] Crear curso con organizacion
+Endpoint: POST /api/cursos
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\04-Crear-curso-con-organizacion.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [5] Abrir curso
+Endpoint: PATCH /api/cursos/1/estado
+Comando: curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/cursos/1/estado" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\05-Abrir-curso.json"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [6] Consultar curso creado
+Endpoint: GET /api/cursos/1
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/cursos/1"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [7] Inscribir estudiante
+Endpoint: POST /api/inscripciones
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/inscripciones" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\06-Inscribir-estudiante.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [8] Consultar inscripciones del estudiante
+Endpoint: GET /api/inscripciones/estudiante/2
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/inscripciones/estudiante/2"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [9] Crear sesion del cronograma
+Endpoint: POST /api/cursos/1/sesiones
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/sesiones" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\07-Crear-sesion-del-cronograma.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [10] Consultar sesiones del curso
+Endpoint: GET /api/cursos/1/sesiones
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/cursos/1/sesiones"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [11] Crear actividad publicada
+Endpoint: POST /api/cursos/1/actividades
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\08-Crear-actividad-publicada.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [12] Consultar actividades del curso
+Endpoint: GET /api/cursos/1/actividades?usuarioId=2
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/cursos/1/actividades?usuarioId=2"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [13] Publicar recurso con enlace
+Endpoint: POST /api/recursos
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/recursos" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\09-Publicar-recurso-con-enlace.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [14] Entregar actividad
+Endpoint: POST /api/cursos/1/actividades/1/entregas
+Comando: curl.exe -i -sS -X POST "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\10-Entregar-actividad.json"
+Respuesta esperada: HTTP 201
+Respuesta real: HTTP 201
+Resultado: OK
+
+## [15] Calificar entrega
+Endpoint: PUT /api/cursos/1/actividades/1/entregas/1/calificacion
+Comando: curl.exe -i -sS -X PUT "http://127.0.0.1:3000/api/cursos/1/actividades/1/entregas/1/calificacion" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\11-Calificar-entrega.json"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [16] Consultar calificaciones del estudiante
+Endpoint: GET /api/cursos/1/calificaciones?estudianteId=2
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/cursos/1/calificaciones?estudianteId=2"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [17] Consultar progreso del estudiante
+Endpoint: GET /api/cursos/1/progreso?estudianteId=2
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/cursos/1/progreso?estudianteId=2"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [18] Consultar estadisticas del curso
+Endpoint: GET /api/cursos/1/estadisticas?docenteId=1
+Comando: curl.exe -i -sS -X GET "http://127.0.0.1:3000/api/cursos/1/estadisticas?docenteId=1"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+## [19] Retirar inscripcion
+Endpoint: PATCH /api/inscripciones/1/retirar
+Comando: curl.exe -i -sS -X PATCH "http://127.0.0.1:3000/api/inscripciones/1/retirar" -H "Content-Type: application/json" --data-binary "@C:\Users\toonk\Downloads\proyecto arquitecturaconvergentes\backend\docs\curl-progresivo-bodies\12-Retirar-inscripcion.json"
+Respuesta esperada: HTTP 200
+Respuesta real: HTTP 200
+Resultado: OK
+
+Resumen: 19 OK / 19 pruebas.
